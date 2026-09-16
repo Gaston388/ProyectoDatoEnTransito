@@ -22,7 +22,6 @@ namespace SRC;
 
     
     public int maximoDispositivos { get; set; }
-    public List<DispositivoRed> dispositivosConectados { get; set; }
 
     public AccessPoint(int id, string nombre, string direccionIp, string direccionMAC, bool encendido, string ssid, string seguridad, string canal, int maximoDispositivos) : base(id, nombre, direccionIp, direccionMAC, encendido)
     {
@@ -30,6 +29,5 @@ namespace SRC;
         this.seguridad = seguridad;
         this.canal = canal;
         this.maximoDispositivos = maximoDispositivos;
-        this.dispositivosConectados = new List<DispositivoRed>();
     }
 }
