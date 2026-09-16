@@ -1,26 +1,28 @@
 namespace SRC;
     public class DispositivoRed
     {
-        public int id {get; set;}
-        private string nombre; 
+        public int Id {get; set;}
+        private readonly string nombre ; 
         public string Nombre
+    {
+        get => nombre;
+        set
         {
-            get{return nombre;}
-            set
+            if (String.IsNullOrEmpty(value))
             {
-                if
-                {
-                    
-                }
+                throw new Exception
             }
         }
-        public string direccionIp {get; set;}
+    }
+    private string direccionIp;
+    public string DirrecionIp
+    get => dirrecionIp
          public string direccionMAC { get; set; }
         public bool encendido { get; set; }
 
         public DispositivoRed (int id, string nombre, string direccionIp, string direccionMAC, bool encendido)
         {
-            this.id = id;
+            Id = id;
             this.nombre= nombre;
             this.direccionIp= direccionIp;
             this.direccionMAC= direccionMAC;
