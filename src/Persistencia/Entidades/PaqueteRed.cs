@@ -1,15 +1,15 @@
-namespace SRC;
+namespace Persistencia.Entidades;
     public class PaqueteRed
     {
-        public int id { get; set; }
-        public string ipOrigen { get; set; }
-        public string ipDestino { get; set; }
-        public string macOrigen { get; set; }
-        public string macDestino { get; set; }
-        public int tamaño { get; set; }
-        public string protocolo { get; set; }
-        public string datos { get; set; }
-        public DateTime horaCreacion { get; set; }
+        public int Id { get; set; }
+        public string IpOrigen { get; set; }
+        public string IpDestino { get; set; }
+        public string MacOrigen { get; set; }
+        public string MacDestino { get; set; }
+        public int Tamaño { get; set; }
+        public string Protocolo { get; set; }
+        public string Datos { get; set; }
+        public DateTime HoraCreacion { get; set; }
 
         public PaqueteRed (int id, string ipOrigen, string ipDestino, string macOrigen, string macDestino, int tamaño, string protocolo, string datos, DateTime horaCreacion)
         {
