@@ -1,4 +1,5 @@
-namespace Persistencia.Entidades;
+namespace Persistencia.Entidades
+{
     public class DispositivoRed
     {
         public int Id {get; set;}
@@ -8,9 +9,9 @@ namespace Persistencia.Entidades;
             get => nombre;
             set
             {
-                if (String.IsNullOrEmpty(value))
+                if(String.IsNullOrEmpty(value))
                 {
-                throw new Exception("El nombre no puede estar vacio");
+                    throw new Exception("El nombre no puede estar vacio");
                 }
                 nombre = value;
             }
@@ -38,8 +39,6 @@ namespace Persistencia.Entidades;
             DireccionIp = direccionIp;
             DireccionMAC = direccionMAC;
             Encendido = encendido;
-
         }
-
-        
     }
+}

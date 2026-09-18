@@ -1,4 +1,5 @@
-namespace Persistencia.Entidades;
+namespace Persistencia.Entidades
+{
     public class Firewall : DispositivoRed
     {   
         //indica si las reglas de Firewall estan activas mmm
@@ -32,3 +33,4 @@ namespace Persistencia.Entidades;
             Tipo = tipo;
         }
     }
+}

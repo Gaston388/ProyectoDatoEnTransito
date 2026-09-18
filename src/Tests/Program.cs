@@ -1,2 +1,11 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿   // Simulacion simulacion = new Simulacion();
+
+//Router router = new Router(...);
+
+//Firewall firewall = new Firewall(...);
+
+//AccessPoint accessPoint = new AccessPoint(...);
+
+//simulacion.AgregarDispositivo(router);
+//simulacion.AgregarDispositivo(firewall);
+//simulacion.AgregarDispositivo(accessPoint);
