@@ -1,6 +1,6 @@
 namespace Persistencia.Entidades
 {
-    public class DispositivoRed
+    public abstract class DispositivoRed
     {
         public int Id {get; set;}
         private string nombre = string.Empty; 
@@ -9,7 +9,7 @@ namespace Persistencia.Entidades
             get => nombre;
             set
             {
-                if(String.IsNullOrEmpty(value))
+                if(String.IsNullOrWhiteSpace(value))
                 {
                     throw new Exception("El nombre no puede estar vacio");
                 }
