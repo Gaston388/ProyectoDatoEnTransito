@@ -1,0 +1,554 @@
+﻿   // Simulacion simulacion = new Simulacion();
+
+//Router router = new Router(...);
+
+//Firewall firewall = new Firewall(...);
+
+//AccessPoint accessPoint = new AccessPoint(...);
+
+//simulacion.AgregarDispositivo(router);
+//simulacion.AgregarDispositivo(firewall);
+//simulacion.AgregarDispositivo(accessPoint);namespace Persistencia.Entidades
+{
+    public class AccessPoint : DispositivoRed
+    {
+        //SSID es el nombre de la red WI-FI
+        private string ssid = string.Empty;
+
+        public string Ssid
+        {
+            get => ssid;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentException("El SSID no puede estar vacío.");
+                }
+            }
+        }
+        //Tipo de proteccion tipo WPA2 o WPA3
+        public string Seguridad
+        {
+            get => seguridad;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                    throw new ArgumentException(
+                        "La seguridad no puede estar vacía.");
+
+                if (value != "WPA2" && value != "WPA3")
+                    throw new ArgumentException(
+                        "La seguridad debe ser WPA2 o WPA3.");
+
+                seguridad = value;
+            }
+        }
+
+        //Canal de WI-FI utilizado como el 6
+        private int canal;
+        public int Canal
+        {
+            get => canal;
+            set
+            {
+                if (value < 1 || value > 14)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"El canal debe estar entre 1 y 14.");
+                }
+                canal = value;
+            }
+        }
+
+        //cantidad maxima de dispsitivos conectados
+        private int maximoDispositivos;
+
+        public int MaximoDispositivos
+        {
+            get => maximoDispositivos;
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"La cantidad máxima de dispositivos debe ser mayor que 0.");
+                }
+                maximoDispositivos = value;
+            }
+        }
+
+
+        public AccessPoint(int id, string nombre, string direccionIp, string direccionMAC, bool encendido, string ssid, string seguridad, int canal, int maximoDispositivos)
+        : base(id, nombre, direccionIp, direccionMAC, encendido)
+        {
+            Ssid = ssid;
+            Seguridad = seguridad;
+            Canal = canal;
+            MaximoDispositivos = maximoDispositivos;
+        }
+        public override bool ProcesarPaquete(PaqueteRed paquete)
+        {
+            if (!Encendido)
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+}namespace Persistencia.Entidades
+{
+    public class DispositivoRed
+    {
+        private int id; 
+        public int Id
+        {
+            get => id;
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"El Id debe ser mayor que 0.");
+                }
+                id = value;
+            }
+        }
+        private string nombre = string.Empty; 
+        public string Nombre
+        {
+            get => nombre;
+            set
+            {
+                if(String.IsNullOrEmpty(value))
+                {
+                    throw new Exception("El nombre no puede estar vacio");
+                }
+                nombre = value;
+            }
+        }
+        private string direccionIp = string.Empty;
+        public string DireccionIp
+        {
+            get => direccionIp;
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    throw new Exception("La direccion Ip no puede estar vacia");
+                }           
+                direccionIp = value;
+            }
+        }    
+        public string DireccionMAC { get; set; }
+        public bool Encendido { get; set; }
+
+        public DispositivoRed (int id, string nombre, string direccionIp, string direccionMAC, bool encendido)
+        {
+            Id = id;
+            Nombre = nombre;
+            DireccionIp = direccionIp;
+            DireccionMAC = direccionMAC;
+            Encendido = encendido;
+        }
+        public abstract bool ProcesarPaquete(PaqueteRed paquete);
+    }
+}
+namespace Persistencia.Entidades;
+    public class Simulacion
+    {
+        public List<DispositivoRed> Dispositivos {get;set;}
+        public List<PaqueteRed> Paquetes {get;set;}
+        public Simulacion()
+        {
+            Dispositivos = new List<DispositivoRed>();
+            Paquetes = new List<PaqueteRed>();
+        }
+        public void AgregarDispositivo(DispositivoRed dispositivo)
+        {
+            Dispositivos.Add(dispositivo);    
+        }
+        public void AgregarPaquete(PaqueteRed paquete)
+        {
+            Paquetes.Add(paquete);
+        }
+        public void ProcesarPaquete(PaqueteRed paquete)
+        {
+            foreach (DispositivoRed dispositivo in Dispositivos)
+            {
+                bool permitido = dispositivo.ProcesarPaquete(paquete);
+
+                paquete.LatenciaAcumulada += dispositivo.Latencia;
+
+                if (!permitido)
+                {
+                    paquete.Procesado = false;
+                    return;
+                }
+            }
+            paquete.Procesado = true;
+        }
+    }
+
+
+namespace Persistencia.Entidades
+{
+    public class Router: DispositivoRed
+    {
+        public List<string> Reglas { get; set; }
+        private int paquetesBloqueados;
+        public int PaquetesBloqueados
+        {
+            get => paquetesBloqueados;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"La cantidad de paquetes bloqueados no puede ser negativa.");
+                }
+                paquetesBloqueados = value;
+            }
+        }
+        private int paquetesPermitidos;
+        public int PaquetesPermitidos
+        {
+            get => paquetesPermitidos;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"La cantidad de paquetes permitidos no puede ser negativa.");
+                }
+                paquetesPermitidos = value;
+            }
+        }
+        public Router (int id, string nombre, string direccionIp, string direccionMAC, bool encendido, int paquetesBloqueados, int paquetesPermitidos)
+        : base  (id,  nombre, direccionIp,  direccionMAC,  encendido)
+        {
+            Reglas = new List<string>();  
+            PaquetesBloqueados = paquetesBloqueados;
+            PaquetesPermitidos = paquetesPermitidos;
+        }
+        public void AgregarRegla(string regla)
+        {
+            if (string.IsNullOrWhiteSpace(regla))
+            {
+                throw new ArgumentException("La regla no puede estar vacía.");
+            }
+            Reglas.Add(regla);
+        }
+        public override bool ProcesarPaquete(PaqueteRed paquete)
+        {
+            if (!Encendido)
+            {
+                return false;
+            }
+            // Por ahora el router permite el paquete.
+            PaquetesPermitidos++;
+            return true;
+        }
+    }
+}        namespace Persistencia.Entidades
+{
+    public class PaqueteRed
+    {
+        //sirve para identificar el problema
+        private int id;
+        public int Id
+        {
+            get => id;
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"El Id debe ser mayor que 0.");
+                }
+                id = value;
+            }
+        }        
+        //indica desde que direccion ip sale el pquete
+       private string ipOrigen = string.Empty;
+
+        public string IpOrigen
+        {
+            get => ipOrigen;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentException("La IP de origen no puede estar vacía.");
+                }
+            }
+        }
+        //indica a que direccion ip se dirige el paquete
+       private string ipDestino = string.Empty;
+
+        public string IpDestino
+        {
+            get => ipDestino;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {    
+                    throw new ArgumentException("La IP de destino no puede estar vacía.");
+                }
+            }
+        }
+        //Representa la direccion MAc del dispositivo que origina el paquete
+        public string MacOrigen { get; set; } = string.Empty;
+        //representa la direccion MAC del destino 
+        public string MacDestino { get; set; } = string.Empty;
+        //indica cuanto ocupa el paquete
+        private int tamaño;
+        public int Tamaño
+        {
+            get => tamaño;
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"El tamaño del paquete debe ser mayor que 0.");
+                }
+                tamaño = value;
+            }
+        }        
+        //indica que protocolo esta utilizando el paquete 
+        //"TCP", "HTTP" , "UDP"
+        private string protocolo = string.Empty;
+        public string Protocolo
+        {
+            get => protocolo;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {   
+                throw new ArgumentException("El protocolo no puede estar vacío.");
+                }
+                value = value.ToUpper().Trim();
+                if (protocoloNormalizado != "TCP" && protocoloNormalizado != "UDP" && protocoloNormalizado != "HTTP")
+                {
+                    throw new ArgumentException("El protocolo debe ser TCP, UDP o HTTP.");
+                }
+                protocolo = value;
+            }
+        }
+        //es el contenido que transporta el paquete
+        private string datos = string.Empty;
+        public string Datos
+        {
+            get => datos;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {    
+                    throw new ArgumentException("Los datos del paquete no pueden estar vacíos.");
+                }
+                datos = value;
+            }
+        }
+        //indica cuando se creo o registro el paquete
+        private DateTime horaCreacion;
+        public DateTime HoraCreacion
+        {
+            get => horaCreacion;
+            set
+            {
+                if (value > DateTime.Now)
+                {
+                    throw new ArgumentException("La hora de creación no puede estar en el futuro.");
+                }
+                horaCreacion = value;
+            }
+        }        
+        public bool Procesado {get;set;}
+        private int latenciaAcumulada;
+        public int LatenciaAcumulada
+        {
+            get => latenciaAcumulada;
+            set
+            {
+                if (value < 0)
+                {
+                throw new ArgumentOutOfRangeException(nameof(value),"La latencia acumulada no puede ser negativa.");
+                }
+                latenciaAcumulada = value;
+            }
+        }        
+        public PaqueteRed (int id, string ipOrigen, string ipDestino, string macOrigen, string macDestino, int tamaño, string protocolo, string datos, DateTime horaCreacion)
+        {
+            Id = id;
+            IpOrigen = ipOrigen;
+            IpDestino = ipDestino;
+            MacOrigen = macOrigen;
+            MacDestino = macDestino;
+            Tamaño = tamaño;
+            Protocolo = protocolo;
+            Datos = datos;
+            HoraCreacion = horaCreacion;
+        }
+    }
+}using System.Runtime.InteropServices;
+
+namespace Persistencia.Entidades
+{
+    public class Firewall : DispositivoRed
+    {   
+        //indica si las reglas de Firewall estan activas mmm
+        //true = esta filtarndo trafico
+        //false = no esta filtrando
+        public bool FiltradoActivo {get;set;}
+        
+        //La politica Predeterminada indica que hacer con el trafico que no coincide con ninguna regla 
+        // opciones = "permitir" or "bloquear"
+        private string politicaPredeterminada = string.Empty;
+        public string PoliticaPredeterminada
+        {
+            get => politicaPredeterminada;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentException("La política predeterminada no puede estar vacía.");
+                }
+                value = value.ToLower().Trim();
+                if (value != "permitir" && value != "bloquear")
+                {
+                    throw new ArgumentException("La política predeterminada debe ser 'permitir' o 'bloquear'.");
+                }
+                politicaPredeterminada = value;
+            }
+        }        
+        //se explica solo
+        private int cantidadReglas;
+        public int CantidadReglas
+        {
+            get => cantidadReglas;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"La cantidad de reglas no puede ser negativa.");
+                }
+                cantidadReglas = value;
+            }
+        }
+        //indice si el fierwall bloquea trafico que intenta entrar a la red
+        public bool BloqueaTraficoEntrante {get;set;}
+
+        //indica si bloquea trafico que sale de la red
+        public bool BloqueaTraficoSaliente {get;set;}
+        //indica el tipo de firewall que representa 
+        private string tipo = string.Empty;
+        public string Tipo
+        {
+            get => tipo;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {   
+                    throw new ArgumentException("El tipo de firewall no puede estar vacío.");
+                }
+                tipo = value.Trim();
+            }
+        }        
+        public Firewall(int id, string nombre, string direccionIp, string direccionMAC, bool encendido, bool filtradoActivo, string politicaPredeterminada, int cantidadReglas, bool bloqueaTraficoEntrante, bool bloqueaTraficoSaliente, string tipo)
+        : base (id, nombre, direccionIp, direccionMAC, encendido)
+        {
+            FiltradoActivo = filtradoActivo;
+            PoliticaPredeterminada = politicaPredeterminada;
+            CantidadReglas = cantidadReglas;
+            BloqueaTraficoEntrante = bloqueaTraficoEntrante;
+            BloqueaTraficoSaliente = bloqueaTraficoSaliente;
+            Tipo = tipo;
+        }
+        public override bool ProcesarPaquete(PaqueteRed paquete)
+        {
+            if (!Encendido)
+            {
+                return false;
+            }
+
+            if (!FiltradoActivo)
+            {
+                return true;
+            }
+
+            if (BloqueaTraficoEntrante)
+            {
+                return false;
+            }
+            if(PoliticaPredeterminada.ToLower() == "bloquear")
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+}
+namespace Persistencia.Entidades;
+    public class Switch : DispositivoRed
+    {
+        private int cantidadPuertos;
+        public int CantidadPuertos
+        {
+            get => cantidadPuertos;
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"La cantidad de puertos debe ser mayor que 0.");
+                }
+                cantidadPuertos = value;
+            }
+        }
+        private int puertosOcupados;
+        public int PuertosOcupados
+        {
+            get => puertosOcupados;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"Los puertos ocupados no pueden ser negativos.");
+                }
+                if (value > CantidadPuertos)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"Los puertos ocupados no pueden superar la cantidad total de puertos.");
+                }
+                puertosOcupados = value;
+            }
+        }
+        public bool VlanActiva { get; set; }
+        private int cantidadVlan;
+        public int CantidadVlan
+        {
+            get => cantidadVlan;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"La cantidad de VLAN no puede ser negativa.");
+                }
+                if (!VlanActiva && value > 0)
+                {
+                    throw new ArgumentException("No puede haber VLAN configuradas si VLAN está desactivada.");
+                }
+                cantidadVlan = value;
+            }
+        }
+        public Switch(int id, string nombre, string direccionIp, string direccionMAC, bool encendido, int cantidadPuertos, int puertosOcupados, bool vlanActiva, int cantidadVlan)
+        : base(id, nombre, direccionIp, direccionMAC, encendido)
+        {
+            CantidadPuertos = cantidadPuertos;
+            PuertosOcupados = puertosOcupados;
+            VlanActiva = vlanActiva;
+            CantidadVlan = cantidadVlan;
+        }
+        public override bool ProcesarPaquete(PaqueteRed paquete)
+        {
+            if (!Encendido)
+            {
+                return false;
+            }
+            // El switch permite continuar el paquete.
+            PaquetesPermitidos++;
+            return true;
+        }
+}
+

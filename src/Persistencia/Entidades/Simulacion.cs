@@ -16,6 +16,22 @@ namespace Persistencia.Entidades;
         {
             Paquetes.Add(paquete);
         }
+        public void ProcesarPaquete(PaqueteRed paquete)
+        {
+            foreach (DispositivoRed dispositivo in Dispositivos)
+            {
+                bool permitido = dispositivo.ProcesarPaquete(paquete);
+
+                paquete.LatenciaAcumulada += dispositivo.Latencia;
+
+                if (!permitido)
+                {
+                    paquete.Procesado = false;
+                    return;
+                }
+            }
+            paquete.Procesado = true;
+        }
     }
 
 

@@ -1,8 +1,20 @@
 namespace Persistencia.Entidades
 {
-    public class DispositivoRed
+    public abstract class DispositivoRed
     {
-        public int Id {get; set;}
+        private int id; 
+        public int Id
+        {
+            get => id;
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"El Id debe ser mayor que 0.");
+                }
+                id = value;
+            }
+        }
         private string nombre = string.Empty; 
         public string Nombre
         {
@@ -40,5 +52,6 @@ namespace Persistencia.Entidades
             DireccionMAC = direccionMAC;
             Encendido = encendido;
         }
+        public abstract bool ProcesarPaquete(PaqueteRed paquete);
     }
 }
