@@ -29,7 +29,7 @@ namespace Persistencia.Entidades
                 direccionIp = value;
             }
         }    
-        public string DireccionMAC { get; set; }
+        public string DireccionMAC { get; set; } = string.Empty;
         public bool Encendido { get; set; }
 
         public DispositivoRed (int id, string nombre, string direccionIp, string direccionMAC, bool encendido)
@@ -40,5 +40,6 @@ namespace Persistencia.Entidades
             DireccionMAC = direccionMAC;
             Encendido = encendido;
         }
+        public abstract bool Procesar(PaqueteRed paquete);
     }
 }

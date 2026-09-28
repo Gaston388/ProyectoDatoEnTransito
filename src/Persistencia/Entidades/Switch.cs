@@ -1,4 +1,4 @@
-namespace SRC;
+namespace Persistencia.Entidades;
     public class Switch : DispositivoRed
     {
         //Cantidad de puertos disponibles en el switch
@@ -15,6 +15,6 @@ namespace SRC;
         {
             CantidadPuertos = cantidadPuertos;
             PuertosOcupados = puertosOcupados;
-            Administrable = administrado;
+            Administrado = administrado;
         }
     }

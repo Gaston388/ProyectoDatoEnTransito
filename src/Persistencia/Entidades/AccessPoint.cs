@@ -7,7 +7,7 @@ namespace Persistencia.Entidades
         public string Ssid
         {
             get{
-                return value;
+                return ssid;
                 }
             set{
                 if (string.IsNullOrWhiteSpace(value))
@@ -19,12 +19,12 @@ namespace Persistencia.Entidades
         }
         
         //Tipo de proteccion tipo WPA2 o WPA3
-        private string Seguridad = string.Empty;
+        private string seguridad = string.Empty;
         public string Seguridad
         {
             get
             {
-                return value ;
+                return seguridad ;
             }
             set
             {
@@ -32,7 +32,7 @@ namespace Persistencia.Entidades
                 {
                     throw new ArgumentException("La seguridad no puede estar vacia");
                 }
-                Seguridad = value;
+                seguridad = value;
             }
         }
         //Canal de WI-FI utilizado como el 6
@@ -41,11 +41,11 @@ namespace Persistencia.Entidades
         {
             get
             {
-                return value;
+                return canal;
             }
             set
             {
-                if(canal<=0)
+                if(value<=0)
                 {
                     throw new ArgumentException("El canal debe ser mayor que cero");
                 }
@@ -60,11 +60,11 @@ namespace Persistencia.Entidades
         {
             get
             {
-                return Value;
+                return maximoDispositivos;
             }
             set
             {
-                if(maximoDispositivos<=0)
+                if(value<=0)
                 {
                     throw new ArgumentException("El maximo de dispositivos debe ser mayor a cero");
                 }
