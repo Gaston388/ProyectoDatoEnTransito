@@ -21,7 +21,7 @@ namespace Persistencia.Entidades
             get => nombre;
             set
             {
-                if(String.IsNullOrEmpty(value))
+                if(String.IsNullOrWhiteSpace(value))
                 {
                     throw new Exception("El nombre no puede estar vacio");
                 }
@@ -41,7 +41,7 @@ namespace Persistencia.Entidades
                 direccionIp = value;
             }
         }    
-        public string DireccionMAC { get; set; }
+        public string DireccionMAC { get; set; } = string.Empty;
         public bool Encendido { get; set; }
 
         public DispositivoRed (int id, string nombre, string direccionIp, string direccionMAC, bool encendido)
