@@ -4,7 +4,6 @@ namespace Persistencia.Entidades
     {
         //SSID es el nombre de la red WI-FI
         private string ssid = string.Empty;
-
         public string Ssid
         {
             get => ssid;
@@ -18,6 +17,7 @@ namespace Persistencia.Entidades
             }
         }
         //Tipo de proteccion tipo WPA2 o WPA3
+        private string seguridad = string.Empty;
         public string Seguridad
         {
             get => seguridad;
@@ -67,8 +67,8 @@ namespace Persistencia.Entidades
         }
 
 
-        public AccessPoint(int id, string nombre, string direccionIp, string direccionMAC, bool encendido, string ssid, string seguridad, int canal, int maximoDispositivos)
-        : base(id, nombre, direccionIp, direccionMAC, encendido)
+        public AccessPoint(int id, string nombre, string direccionIp, string direccionMAC, bool encendido, string ssid, string seguridad, int canal, int maximoDispositivos, int latencia)
+        : base(id, nombre, direccionIp, direccionMAC, encendido, latencia)
         {
             Ssid = ssid;
             Seguridad = seguridad;

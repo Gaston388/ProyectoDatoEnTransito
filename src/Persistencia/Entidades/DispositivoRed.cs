@@ -1,6 +1,6 @@
 namespace Persistencia.Entidades
 {
-    public abstract class DispositivoRed
+     public abstract class DispositivoRed
     {
         private int id; 
         public int Id
@@ -34,23 +34,49 @@ namespace Persistencia.Entidades
             get => direccionIp;
             set
             {
-                if (string.IsNullOrEmpty(value))
+                if (string.IsNullOrWhiteSpace(value))
                 {
                     throw new Exception("La direccion Ip no puede estar vacia");
                 }           
                 direccionIp = value;
             }
         }    
-        public string DireccionMAC { get; set; } = string.Empty;
+        private string direccionMAC = string.Empty;
+        public string DireccionMAC
+        {
+            get => direccionMAC;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new Exception("La direccion MAC no puede estar vacia");
+                }           
+                direccionMAC = value;
+            }
+        }
         public bool Encendido { get; set; }
+        private int latencia = 0;
+        public int Latencia
+        {
+            get => latencia;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"La latencia no puede ser negativa.");
+                }
+                latencia = value;
+            }
+        }
 
-        public DispositivoRed (int id, string nombre, string direccionIp, string direccionMAC, bool encendido)
+        public DispositivoRed (int id, string nombre, string direccionIp, string direccionMAC, bool encendido, int latencia )
         {
             Id = id;
             Nombre = nombre;
             DireccionIp = direccionIp;
             DireccionMAC = direccionMAC;
             Encendido = encendido;
+            Latencia = latencia;
         }
         public abstract bool ProcesarPaquete(PaqueteRed paquete);
     }

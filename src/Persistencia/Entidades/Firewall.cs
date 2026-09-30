@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-
 namespace Persistencia.Entidades
 {
     public class Firewall : DispositivoRed
@@ -62,8 +60,8 @@ namespace Persistencia.Entidades
                 tipo = value.Trim();
             }
         }        
-        public Firewall(int id, string nombre, string direccionIp, string direccionMAC, bool encendido, bool filtradoActivo, string politicaPredeterminada, int cantidadReglas, bool bloqueaTraficoEntrante, bool bloqueaTraficoSaliente, string tipo)
-        : base (id, nombre, direccionIp, direccionMAC, encendido)
+        public Firewall(int id, string nombre, string direccionIp, string direccionMAC, bool encendido, bool filtradoActivo, string politicaPredeterminada, int cantidadReglas, bool bloqueaTraficoEntrante, bool bloqueaTraficoSaliente, string tipo, int latencia)
+        : base (id, nombre, direccionIp, direccionMAC, encendido, latencia)
         {
             FiltradoActivo = filtradoActivo;
             PoliticaPredeterminada = politicaPredeterminada;

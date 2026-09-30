@@ -29,8 +29,8 @@ namespace Persistencia.Entidades
                 paquetesPermitidos = value;
             }
         }
-        public Router (int id, string nombre, string direccionIp, string direccionMAC, bool encendido, int paquetesBloqueados, int paquetesPermitidos)
-        : base  (id,  nombre, direccionIp,  direccionMAC,  encendido)
+        public Router (int id, string nombre, string direccionIp, string direccionMAC, bool encendido, int paquetesBloqueados, int paquetesPermitidos, int latencia)
+        : base  (id,  nombre, direccionIp,  direccionMAC,  encendido, latencia)
         {
             Reglas = new List<string>();  
             PaquetesBloqueados = paquetesBloqueados;

@@ -47,9 +47,33 @@ namespace Persistencia.Entidades
             }
         }
         //Representa la direccion MAc del dispositivo que origina el paquete
-        public string MacOrigen { get; set; } = string.Empty;
+        private string macOrigen = string.Empty;
+        public string MacOrigen
+        {
+            get => macOrigen;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentException("La MAC de origen no puede estar vacía.");
+                }
+                macOrigen = value;
+            }
+        }
         //representa la direccion MAC del destino 
-        public string MacDestino { get; set; } = string.Empty;
+        private string macDestino = string.Empty;
+        public string MacDestino
+        {
+            get => macDestino;
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    throw new ArgumentException("La MAC de destino no puede estar vacía.");
+                }
+                macDestino = value;
+            }
+        }
         //indica cuanto ocupa el paquete
         private int tamaño;
         public int Tamaño
@@ -81,7 +105,7 @@ namespace Persistencia.Entidades
                 {
                     throw new ArgumentException("El protocolo debe ser TCP, UDP o HTTP.");
                 }
-                protocolo = value;
+                protocolo = protocoloNormalizado;
             }
         }
         //es el contenido que transporta el paquete

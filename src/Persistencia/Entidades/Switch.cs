@@ -49,8 +49,8 @@ namespace Persistencia.Entidades;
                 cantidadVlan = value;
             }
         }
-        public Switch(int id, string nombre, string direccionIp, string direccionMAC, bool encendido, int cantidadPuertos, int puertosOcupados, bool vlanActiva, int cantidadVlan)
-        : base(id, nombre, direccionIp, direccionMAC, encendido)
+        public Switch(int id, string nombre, string direccionIp, string direccionMAC, bool encendido, int cantidadPuertos, int puertosOcupados, bool vlanActiva, int cantidadVlan, int latencia)
+        : base(id, nombre, direccionIp, direccionMAC, encendido, latencia)
         {
             CantidadPuertos = cantidadPuertos;
             PuertosOcupados = puertosOcupados;

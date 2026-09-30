@@ -1,9 +1,8 @@
-using Aplicacion.Interfaces;
 using Persistencia.Entidades;
-
+using Aplicacion.Interfaces;
 namespace Aplicacion.Servicios
 {
-    public class SimulacionService : ISimulacionService
+    public class SimulacionServicio : ISimulacionServicio
     {
         public void AgregarDispositivo(Simulacion simulacion,DispositivoRed dispositivo)
         {
