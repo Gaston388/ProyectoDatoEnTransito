@@ -1,12 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+    using Persistencia.Repositorios.InterfazRepositorios;
+using Persistencia.Entidades;
 
 namespace Persistencia.Repositorios
 {
-    public class SimulacionRepositorio
+    public class SimulacionRepositorio : ISimulacionRepositorio
     {
-        
+        public Simulacion BuscarPorId(int id)
+        {
+            throw new NotImplementedException();
+        }
+        public List<Simulacion> Listar()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

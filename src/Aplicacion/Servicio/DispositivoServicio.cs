@@ -1,7 +1,7 @@
 using Persistencia.Entidades;
 using Aplicacion.Interfaces;
 
-namespace Aplicacion.Servicio
+namespace Aplicacion.Servicios
 {
     public class DispositivoServicio : IDispositivoServicio
     {

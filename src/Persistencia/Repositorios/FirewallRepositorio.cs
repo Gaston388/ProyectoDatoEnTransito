@@ -1,12 +1,25 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Persistencia.Repositorios.InterfazRepositorios;
+using Persistencia.Entidades;
 
 namespace Persistencia.Repositorios
 {
-    public interface FirewallRepositorio
+    public interface FirewallRepositorio : IFirewallRepositorio
     {
-        
+        public void Agregar(Firewall firewall)
+        {
+            throw new NotImplementedException();
+        }
+        public Firewall ObtenerPorId(int id)
+        {
+            throw new NotImplementedException();
+        }
+        public List<Firewall> Listar()
+        {
+            throw new NotImplementedException();
+        }
+        public void Eliminar(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

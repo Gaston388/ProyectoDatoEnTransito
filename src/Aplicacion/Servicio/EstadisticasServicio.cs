@@ -1,9 +1,9 @@
 using Persistencia.Entidades;
 using Aplicacion.Interfaces;
 
-namespace Aplicacion.Servicio
+namespace Aplicacion.Servicios
 {
-    public class EstadisticasSErvicio
+    public class EstadisticasSErvicio : IEstadisticaServicio
     {
         public void ConsultarEstadisticas(Simulacion simulacion)
         {

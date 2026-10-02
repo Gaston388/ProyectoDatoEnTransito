@@ -2,6 +2,19 @@ namespace Persistencia.Entidades
 {
     public class PaqueteRed
     {
+        private int ttl;
+        public int Ttl
+        {
+            get => ttl;
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(value),"El TTL no puede ser negativo.");
+                }
+                ttl = value;
+            }
+        }
         //sirve para identificar el problema
         private int id;
         public int Id
@@ -150,7 +163,7 @@ namespace Persistencia.Entidades
                 latenciaAcumulada = value;
             }
         }        
-        public PaqueteRed (int id, string ipOrigen, string ipDestino, string macOrigen, string macDestino, int tamaño, string protocolo, string datos, DateTime horaCreacion)
+        public PaqueteRed (int ttl, int id, string ipOrigen, string ipDestino, string macOrigen, string macDestino, int tamaño, string protocolo, string datos, DateTime horaCreacion)
         {
             Id = id;
             IpOrigen = ipOrigen;
@@ -161,6 +174,7 @@ namespace Persistencia.Entidades
             Protocolo = protocolo;
             Datos = datos;
             HoraCreacion = horaCreacion;
+            Ttl = ttl;
         }
     }
 }

@@ -1,5 +1,6 @@
 using Persistencia.Entidades;
 using Aplicacion.Interfaces;
+
 namespace Aplicacion.Servicios
 {
     public class SimulacionServicio : ISimulacionServicio
