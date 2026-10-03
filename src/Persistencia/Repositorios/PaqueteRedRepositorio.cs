@@ -43,7 +43,7 @@ namespace Persistencia.Repositorios
                     @HoraCreacion,
                     @Procesado,
                     @LatenciaAcumulada,
-                    @TTL
+                    @TtL
                 );";
             connection.Execute(sql, paqueteRed);
         }

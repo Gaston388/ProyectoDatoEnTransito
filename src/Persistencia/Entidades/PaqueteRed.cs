@@ -8,7 +8,7 @@ namespace Persistencia.Entidades
             get => ttl;
             set
             {
-                if (value <= 0)
+                if (value < 0)
                 {
                     throw new ArgumentOutOfRangeException(nameof(value),"El TTL no puede ser negativo.");
                 }

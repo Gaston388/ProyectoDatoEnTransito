@@ -34,6 +34,11 @@ namespace Persistencia.Entidades;
         {
             foreach (DispositivoRed dispositivo in Dispositivos)
             {
+                if (paquete.Ttl <= 0)
+                {
+                    paquete.Procesado = false ;
+                    return;
+                }
                 bool permitido = dispositivo.ProcesarPaquete(paquete);
 
                 paquete.LatenciaAcumulada += dispositivo.Latencia;
