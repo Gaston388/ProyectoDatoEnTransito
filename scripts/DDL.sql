@@ -2,9 +2,6 @@ CREATE DATABASE IF NOT EXISTS datos_transito;
 
 USE datos_transito;
 
--- =========================================
--- AUDITORIAS
--- =========================================
 
 CREATE TABLE auditorias
 (
@@ -15,9 +12,6 @@ CREATE TABLE auditorias
 );
 
 
--- =========================================
--- PAQUETES
--- =========================================
 
 CREATE TABLE paquetes
 (
@@ -49,10 +43,6 @@ CREATE TABLE paquetes
 );
 
 
--- =========================================
--- DISPOSITIVOS
--- Datos comunes de DispositivoRed
--- =========================================
 
 CREATE TABLE dispositivos
 (
@@ -70,9 +60,6 @@ CREATE TABLE dispositivos
 );
 
 
--- =========================================
--- SIMULACIONES
--- =========================================
 
 CREATE TABLE simulaciones
 (
@@ -80,9 +67,6 @@ CREATE TABLE simulaciones
 );
 
 
--- =========================================
--- ACCESS POINT
--- =========================================
 
 CREATE TABLE access_points
 (
@@ -107,10 +91,6 @@ CREATE TABLE access_points
     CHECK (maximo_dispositivos > 0)
 );
 
-
--- =========================================
--- FIREWALL
--- =========================================
 
 CREATE TABLE firewalls
 (
@@ -141,10 +121,6 @@ CREATE TABLE firewalls
 );
 
 
--- =========================================
--- ROUTER
--- =========================================
-
 CREATE TABLE routers
 (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -165,10 +141,6 @@ CREATE TABLE routers
     CHECK (paquetes_permitidos >= 0)
 );
 
-
--- =========================================
--- SWITCH
--- =========================================
 
 CREATE TABLE switches
 (
@@ -201,10 +173,6 @@ CREATE TABLE switches
 );
 
 
--- =========================================
--- RELACION SIMULACION - PAQUETE
--- =========================================
-
 CREATE TABLE simulacion_paquetes
 (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -225,11 +193,6 @@ CREATE TABLE simulacion_paquetes
 );
 
 
--- =========================================
--- RECORRIDOS
--- Guarda el paso de un paquete por los
--- dispositivos de una simulacion
--- =========================================
 
 CREATE TABLE recorridos
 (

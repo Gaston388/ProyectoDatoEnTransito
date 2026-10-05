@@ -76,7 +76,11 @@ namespace Tests
          var servicio = new SimulacionServicio();
          servicio.AgregarDispositivo(simulacion, router);
          servicio.ProcesarPaquete(simulacion, paquete);
+
+         Assert.True(simulacion.Finalizado);
          Assert.True(paquete.Procesado);
+         Assert.Equal(default, simulacion.FechaInicio);
+         Assert.NotEqual(simulacion.FechaInicio, simulacion.FechaFin);
          Assert.Equal(10, paquete.LatenciaAcumulada);
          Assert.Equal(9, paquete.Ttl);
       }

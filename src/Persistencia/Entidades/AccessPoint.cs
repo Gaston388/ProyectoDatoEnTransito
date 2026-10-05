@@ -2,6 +2,7 @@ namespace Persistencia.Entidades
 {
     public class AccessPoint : DispositivoRed
     {
+        
         //SSID es el nombre de la red WI-FI
         private string ssid = string.Empty;
         public string Ssid

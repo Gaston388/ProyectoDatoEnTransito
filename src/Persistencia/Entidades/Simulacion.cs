@@ -1,6 +1,9 @@
 namespace Persistencia.Entidades;
     public class Simulacion
     {
+        public DateTime FechaInicio{get;set;}
+        public DateTime FechaFin{get;set;}
+        public bool Finalizado {get;set;}
         private int id;
         public int Id
         {
@@ -19,6 +22,7 @@ namespace Persistencia.Entidades;
         public Simulacion(int id)
         {
             Id = id;
+            Finalizado = false;
             Dispositivos = new List<DispositivoRed>();
             Paquetes = new List<PaqueteRed>();
         }
@@ -30,14 +34,15 @@ namespace Persistencia.Entidades;
         {
             Paquetes.Add(paquete);
         }
-        public void ProcesarPaquete(PaqueteRed paquete)
+        public bool ProcesarPaquete(PaqueteRed paquete)
         {
             foreach (DispositivoRed dispositivo in Dispositivos)
             {
                 if (paquete.Ttl <= 0)
                 {
                     paquete.Procesado = false ;
-                    return;
+                    Finalizar(false);
+                    return false;
                 }
                 bool permitido = dispositivo.ProcesarPaquete(paquete);
 
@@ -46,10 +51,18 @@ namespace Persistencia.Entidades;
                 if (!permitido)
                 {
                     paquete.Procesado = false;
-                    return;
+                    Finalizar(false);
+                    return false;
                 }
             }
             paquete.Procesado = true;
+            Finalizar(true);
+            return true;
+        }
+        public void Finalizar(bool resultado)
+        {
+            FechaFin = DateTime.Now;
+            Finalizado = resultado;
         }
     }
 

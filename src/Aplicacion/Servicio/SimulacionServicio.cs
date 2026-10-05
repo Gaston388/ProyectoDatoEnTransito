@@ -46,7 +46,7 @@ namespace Aplicacion.Servicios
             simulacion.AgregarPaquete(paquete);
         }
 
-        public void ProcesarPaquete(Simulacion simulacion, PaqueteRed paquete)
+        public bool ProcesarPaquete(Simulacion simulacion, PaqueteRed paquete)
         {
             if (simulacion == null)
             {
@@ -58,7 +58,7 @@ namespace Aplicacion.Servicios
                 throw new ArgumentNullException(nameof(paquete));
             }
 
-            simulacion.ProcesarPaquete(paquete);
+            return simulacion.ProcesarPaquete(paquete);
         }
 
         public Simulacion BuscarPorId(int id)
