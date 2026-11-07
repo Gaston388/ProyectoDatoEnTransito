@@ -1,79 +1,47 @@
 using Aplicacion.Interfaces;
 using Persistencia.Entidades;
-using Persistencia.Repositorios.InterfazRepositorios;
 
 namespace Aplicacion.Servicios
 {
     public class DispositivoServicio : IDispositivoServicio
     {
-        private readonly IAccessPointRepositorio _accessPointRepositorio;
-        private readonly IRouterRepositorio _routerRepositorio;
-        private readonly IFirewallRepositorio _firewallRepositorio;
-        private readonly ISwitchRepositorio _switchRepositorio;
-
-        public DispositivoServicio(
-            IAccessPointRepositorio accessPointRepositorio,
-            IRouterRepositorio routerRepositorio,
-            IFirewallRepositorio firewallRepositorio,
-            ISwitchRepositorio switchRepositorio)
-        {
-            _accessPointRepositorio = accessPointRepositorio;
-            _routerRepositorio = routerRepositorio;
-            _firewallRepositorio = firewallRepositorio;
-            _switchRepositorio = switchRepositorio;
-        }
+        // Administra los dispositivos que pertenecen a una simulación en memoria.
+        // No recibe repositorios porque esta clase no consulta ni guarda en la base de datos.
 
         public void RegistrarDispositivo(Simulacion simulacion, DispositivoRed dispositivo)
         {
-            if (simulacion == null)
-            {
-                throw new ArgumentNullException(nameof(simulacion));
-            }
-
-            if (dispositivo == null)
-            {
-                throw new ArgumentNullException(nameof(dispositivo));
-            }
+            ArgumentNullException.ThrowIfNull(simulacion);
+            ArgumentNullException.ThrowIfNull(dispositivo);
 
             simulacion.AgregarDispositivo(dispositivo);
         }
 
         public DispositivoRed ObtenerDispositivoPorId(Simulacion simulacion, int id)
         {
-            if (simulacion == null)
-            {
-                throw new ArgumentNullException(nameof(simulacion));
-            }
+            ArgumentNullException.ThrowIfNull(simulacion);
 
             if (id <= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(id), "El Id debe ser mayor que 0.");
+                throw new ArgumentOutOfRangeException(nameof(id), "El ID debe ser mayor que 0.");
             }
 
-            foreach (var dispositivo in simulacion.Dispositivos)
-            {
-                if (dispositivo.Id == id)
-                {
-                    return dispositivo;
-                }
-            }
+            DispositivoRed? dispositivo = simulacion.Dispositivos
+                .FirstOrDefault(d => d.Id == id);
 
-            throw new Exception("No se encontró el dispositivo");
+            return dispositivo ?? throw new KeyNotFoundException(
+                $"No se encontró un dispositivo con el ID {id} en la simulación.");
         }
 
         public void EliminarDispositivo(Simulacion simulacion, DispositivoRed dispositivo)
         {
-            if (simulacion == null)
-            {
-                throw new ArgumentNullException(nameof(simulacion));
-            }
+            ArgumentNullException.ThrowIfNull(simulacion);
+            ArgumentNullException.ThrowIfNull(dispositivo);
 
-            if (dispositivo == null)
+            if (!simulacion.Dispositivos.Remove(dispositivo))
             {
-                throw new ArgumentNullException(nameof(dispositivo));
+                throw new KeyNotFoundException(
+                    $"El dispositivo con ID {dispositivo.Id} no pertenece a esta simulación.");
             }
-
-            simulacion.Dispositivos.Remove(dispositivo);
         }
     }
 }
