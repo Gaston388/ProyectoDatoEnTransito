@@ -10,19 +10,20 @@ namespace Aplicacion.Servicios
 
         public PaqueteServicio(IPaqueteRedRepositorio paqueteRepositorio)
         {
-            _paqueteRepositorio = paqueteRepositorio;
+            _paqueteRepositorio = paqueteRepositorio
+            ?? throw new ArgumentNullException(nameof(paqueteRepositorio));
         }
 
         public void CrearPaquete(Simulacion simulacion, PaqueteRed paquete)
         {
             if (simulacion == null)
             {
-                throw new ArgumentNullException(nameof(simulacion));
+                throw new ArgumentNullException(nameof(simulacion), "La simulación no puede ser nula.");
             }
 
             if (paquete == null)
             {
-                throw new ArgumentNullException(nameof(paquete));
+                throw new ArgumentNullException(nameof(paquete), "El paquete no puede ser nulo.");
             }
 
             simulacion.AgregarPaquete(paquete);

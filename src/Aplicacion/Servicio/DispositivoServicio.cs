@@ -1,28 +1,10 @@
 using Aplicacion.Interfaces;
 using Persistencia.Entidades;
-using Persistencia.Repositorios.InterfazRepositorios;
 
 namespace Aplicacion.Servicios
 {
     public class DispositivoServicio : IDispositivoServicio
     {
-        private readonly IAccessPointRepositorio _accessPointRepositorio;
-        private readonly IRouterRepositorio _routerRepositorio;
-        private readonly IFirewallRepositorio _firewallRepositorio;
-        private readonly ISwitchRepositorio _switchRepositorio;
-
-        public DispositivoServicio(
-            IAccessPointRepositorio accessPointRepositorio,
-            IRouterRepositorio routerRepositorio,
-            IFirewallRepositorio firewallRepositorio,
-            ISwitchRepositorio switchRepositorio)
-        {
-            _accessPointRepositorio = accessPointRepositorio;
-            _routerRepositorio = routerRepositorio;
-            _firewallRepositorio = firewallRepositorio;
-            _switchRepositorio = switchRepositorio;
-        }
-
         public void RegistrarDispositivo(Simulacion simulacion, DispositivoRed dispositivo)
         {
             if (simulacion == null)

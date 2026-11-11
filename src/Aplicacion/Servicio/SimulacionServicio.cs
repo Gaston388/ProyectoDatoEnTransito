@@ -10,8 +10,9 @@ namespace Aplicacion.Servicios
 
         public SimulacionServicio(ISimulacionRepositorio simulacionRepositorio)
         {
-            _simulacionRepositorio = simulacionRepositorio;
+            _simulacionRepositorio = simulacionRepositorio;        
         }
+        //este constructor vacio se conserva para no impedir las operaciones en memoria
         public SimulacionServicio()
         {
             _simulacionRepositorio = null ;
@@ -65,14 +66,22 @@ namespace Aplicacion.Servicios
         {
             if (id <= 0)
             {
-                throw new ArgumentException("El ID debe ser mayor que 0.");
+                throw new ArgumentOutOfRangeException(nameof(id), "El ID debe ser mayor que 0.");
             }
-
+            if(_simulacionRepositorio == null)
+            {
+                throw new InvalidOperationException("El repositorio de simulación no está inicializado.");
+            }
             return _simulacionRepositorio.BuscarPorId(id);
         }
 
         public List<Simulacion> Listar()
         {
+            if(_simulacionRepositorio == null)
+            {
+                throw new InvalidOperationException("El repositorio de simulación no está inicializado.");
+            }
+
             return _simulacionRepositorio.Listar();
         }
     }
