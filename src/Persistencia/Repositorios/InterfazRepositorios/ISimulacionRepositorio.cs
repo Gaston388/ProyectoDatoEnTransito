@@ -4,7 +4,7 @@ namespace Persistencia.Repositorios.InterfazRepositorios
 {
     public interface ISimulacionRepositorio
     {
-        Simulacion BuscarPorId(int id);
+        Simulacion? BuscarPorId(int id);
         List<Simulacion> Listar();
     }
 }

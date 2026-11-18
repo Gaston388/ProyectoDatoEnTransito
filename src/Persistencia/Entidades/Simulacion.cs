@@ -2,7 +2,7 @@ namespace Persistencia.Entidades;
     public class Simulacion
     {
         public DateTime FechaInicio{get;set;}
-        public DateTime FechaFin{get;set;}
+        public DateTime? FechaFin{get;set;}
         public bool Finalizado {get;set;}
         private int id;
         public int Id
@@ -19,6 +19,11 @@ namespace Persistencia.Entidades;
         }
         public List<DispositivoRed> Dispositivos {get;set;}
         public List<PaqueteRed> Paquetes {get;set;}
+        public Simulacion()
+        {
+            Dispositivos = new List<DispositivoRed>();
+            Paquetes = new List<PaqueteRed>();
+        }
         public Simulacion(int id)
         {
             Id = id;

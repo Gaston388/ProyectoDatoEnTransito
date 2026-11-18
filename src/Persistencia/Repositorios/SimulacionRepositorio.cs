@@ -13,22 +13,28 @@ namespace Persistencia.Repositorios
         {
             this.conexion = conexion;
         }
-        public Simulacion BuscarPorId(int id)
+        public Simulacion? BuscarPorId(int id)
         {
             using MySqlConnection connection = conexion.CrearConexion();
             string sql = @"
             SELECT
-            id AS ID
+            id AS ID,
+            fecha_inicio AS FechaInicio,
+            fecha_fin AS FechaFin,
+            finalizado As Finalizado
             FROM simulaciones
             WHERE id = @id;";
-            return connection.QueryFirst<Simulacion>(sql, new { id });
+            return connection.QueryFirstOrDefault<Simulacion>(sql, new { id });
         }
         public List<Simulacion> Listar()
         {
             using MySqlConnection connection = conexion.CrearConexion();
             string sql = @"
             SELECT 
-            id AS ID
+            id AS ID,
+            fecha_inicio AS FechaInicio,
+            fecha_fin AS FechaFin,
+            finalizado As Finalizado
             FROM simulaciones;";
             return connection.Query<Simulacion>(sql).ToList();
 

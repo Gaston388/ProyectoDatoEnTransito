@@ -62,7 +62,7 @@ namespace Aplicacion.Servicios
             return simulacion.ProcesarPaquete(paquete);
         }
 
-        public Simulacion BuscarPorId(int id)
+        public Simulacion? BuscarPorId(int id)
         {
             if (id <= 0)
             {

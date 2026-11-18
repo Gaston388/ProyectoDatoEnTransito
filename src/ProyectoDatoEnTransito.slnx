@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="API/API.csproj" />
   <Project Path="Aplicacion/Aplicacion.csproj" />
   <Project Path="Persistencia/Persistencia.csproj" />
   <Project Path="Tests/Tests.csproj" />
