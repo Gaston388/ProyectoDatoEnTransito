@@ -48,6 +48,18 @@ namespace API.Endpoints
                     exitoso = exitoso
                 });
             });
+
+            // DELETE /api/simulaciones/{id}
+            app.MapDelete("/api/simulaciones/{id:int}",
+                (int id, ISimulacionServicio servicio) =>
+            {
+                if (servicio.BuscarPorId(id) == null)
+                    return Results.NotFound();
+
+                servicio.Eliminar(id);
+
+                return Results.NoContent();
+            });
         }
     }
 }

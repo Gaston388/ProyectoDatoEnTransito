@@ -66,8 +66,28 @@ namespace Aplicacion.Servicios
             }
 
             paquete.TtlFinal = paquete.Ttl;
-            
+
             _paqueteRepositorio.ActualizarResultado(paquete);
         }
+
+        public PaqueteRed? ObtenerPorSimulacionId(int simulacionId)
+        {
+            if (simulacionId <= 0)
+                throw new ArgumentOutOfRangeException(nameof(simulacionId));
+
+            return _paqueteRepositorio.ObtenerPorSimulacionId(simulacionId);
+        }
+
+        public void ActualizarDatos(PaqueteRed paquete)
+        {
+            if (paquete == null)
+                throw new ArgumentNullException(nameof(paquete));
+
+            if (paquete.Id <= 0)
+                throw new ArgumentException("El paquete debe tener un ID válido.");
+
+            _paqueteRepositorio.ActualizarDatos(paquete);
+        }
+
     }
 }

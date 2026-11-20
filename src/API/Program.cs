@@ -67,5 +67,7 @@ app.MapSwitchEndpoints();
 app.MapFirewallEndpoints();
 
 app.MapAccessPointEndpoints();
+
+app.MapDispositivoEndpoints();
 //ruta http , recibe un servicio y nos entrega una instancia, 
 app.Run();

@@ -6,5 +6,7 @@ namespace Aplicacion.Interfaces
     {
         void CrearPaquete(Simulacion simulacion, PaqueteRed paquete);
         void ActualizarResultado(PaqueteRed paquete);
+        PaqueteRed? ObtenerPorSimulacionId(int simulacionId);
+        void ActualizarDatos(PaqueteRed paquete);
     }
 }

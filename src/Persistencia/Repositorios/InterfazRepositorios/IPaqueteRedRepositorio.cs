@@ -8,5 +8,7 @@ namespace Persistencia.Repositorios.InterfazRepositorios
         PaqueteRed? ObtenerPorId(int id);
         List <PaqueteRed> Listar();
         void ActualizarResultado(PaqueteRed paquete);
+        PaqueteRed? ObtenerPorSimulacionId(int simulacionId);
+        void ActualizarDatos(PaqueteRed paquete);
     }
 }

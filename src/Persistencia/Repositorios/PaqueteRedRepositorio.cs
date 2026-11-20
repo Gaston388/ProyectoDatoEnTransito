@@ -73,6 +73,7 @@ namespace Persistencia.Repositorios
             string sql = @"
                 SELECT
                     ttl_inicial AS Ttl,
+                    ttl_final AS TtlFinal,
                     id AS Id,
                     ip_origen AS IpOrigen,
                     ip_destino AS IpDestino,
@@ -96,6 +97,7 @@ namespace Persistencia.Repositorios
             string sql = @"
                 SELECT
                     ttl_inicial AS Ttl,
+                    ttl_final AS TtlFinal,
                     id AS Id,
                     ip_origen AS IpOrigen,
                     ip_destino AS IpDestino,
@@ -132,5 +134,56 @@ namespace Persistencia.Repositorios
                 paquete.Id
             });
         }
+
+        public PaqueteRed? ObtenerPorSimulacionId(int simulacionId)
+        {
+            using MySqlConnection connection = conexion.CrearConexion();
+
+            string sql = @"
+                SELECT
+                    p.ttl_inicial AS Ttl,
+                    p.ttl_final AS TtlFinal,
+                    p.id AS Id,
+                    p.ip_origen AS IpOrigen,
+                    p.ip_destino AS IpDestino,
+                    p.mac_origen AS MacOrigen,
+                    p.mac_destino AS MacDestino,
+                    p.tamano AS Tamaño,
+                    p.protocolo AS Protocolo,
+                    p.datos AS Datos,
+                    p.hora_creacion AS HoraCreacion,
+                    p.procesado AS Procesado,
+                    p.latencia_acumulada AS LatenciaAcumulada
+                FROM paquetes p
+                INNER JOIN simulacion_paquetes sp
+                    ON p.id = sp.paquete_id
+                WHERE sp.simulacion_id = @SimulacionId;
+            ";
+
+            return connection.QueryFirstOrDefault<PaqueteRed>(
+                sql, new { SimulacionId = simulacionId });
+        }
+
+        public void ActualizarDatos(PaqueteRed paquete)
+        {
+            using MySqlConnection connection = conexion.CrearConexion();
+
+            string sql = @"
+                UPDATE paquetes
+                SET ip_origen = @IpOrigen,
+                    ip_destino = @IpDestino,
+                    mac_origen = @MacOrigen,
+                    mac_destino = @MacDestino,
+                    tamano = @Tamaño,
+                    protocolo = @Protocolo,
+                    datos = @Datos,
+                    hora_creacion = @HoraCreacion,
+                    ttl_inicial = @Ttl
+                WHERE id = @Id;
+            ";
+
+            connection.Execute(sql, paquete);
+        }
+
     }
 }

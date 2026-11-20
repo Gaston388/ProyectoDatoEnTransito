@@ -267,8 +267,8 @@ namespace Aplicacion.Servicios
             // 6. Guardamos el paquete y lo asociamos.
             _paqueteServicio.CrearPaquete(simulacion, paquete);
             
-            bool exitoso = ProcesarPaquete(simulacion, paquete);
-
+            bool exitoso = ProcesarYGuardarRecorrido(simulacion, paquete);
+            
             _paqueteServicio.ActualizarResultado(paquete);
 
             Finalizar(simulacion.Id, exitoso);
@@ -281,5 +281,64 @@ namespace Aplicacion.Servicios
                 LatenciaTotalMs = paquete.LatenciaAcumulada
             };
         }
+        public void Eliminar(int id)
+        {
+            if (id <= 0)
+                throw new ArgumentOutOfRangeException(nameof(id));
+
+            if (_simulacionRepositorio == null)
+                throw new InvalidOperationException(
+                    "El repositorio de simulación no está inicializado.");
+
+            Simulacion? simulacion = _simulacionRepositorio.BuscarPorId(id);
+
+            if (simulacion == null)
+                throw new KeyNotFoundException(
+                    "No existe una simulación con ese ID.");
+
+            _simulacionRepositorio.Eliminar(id);
+        }
+
+        private bool ProcesarYGuardarRecorrido(Simulacion simulacion, PaqueteRed paquete)
+        {
+            int orden = 1;
+
+            foreach (DispositivoRed dispositivo in simulacion.Dispositivos)
+            {
+                if (paquete.Ttl <= 0)
+                {
+                    paquete.Procesado = false;
+                    simulacion.Finalizar(false);
+                    return false;
+                }
+
+                bool permitido = dispositivo.ProcesarPaquete(paquete);
+
+                paquete.LatenciaAcumulada += dispositivo.Latencia;
+
+                _simulacionRepositorio!.AgregarPaso(
+                    simulacion.Id,
+                    dispositivo.Id,
+                    orden,
+                    dispositivo.Latencia,
+                    paquete.Ttl
+                );
+
+                orden++;
+
+                if (!permitido)
+                {
+                    paquete.Procesado = false;
+                    simulacion.Finalizar(false);
+                    return false;
+                }
+            }
+
+            paquete.Procesado = true;
+            simulacion.Finalizar(true);
+
+            return true;
+        }
+
     }
 }

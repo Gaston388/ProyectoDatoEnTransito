@@ -15,6 +15,7 @@ CREATE TABLE auditorias
 
 CREATE TABLE paquetes
 (
+    
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 
     ip_origen VARCHAR(45) NOT NULL,
@@ -34,6 +35,7 @@ CREATE TABLE paquetes
     latencia_acumulada INT UNSIGNED NOT NULL DEFAULT 0,
 
     ttl_inicial INT UNSIGNED NOT NULL,
+    ttl_final INT UNSIGNED NULL,
 
     CHECK (protocolo IN ('TCP', 'UDP', 'HTTP'))
 );
@@ -60,8 +62,8 @@ CREATE TABLE simulaciones
     id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     fecha_inicio DATETIME NOT NULL,
     fecha_fin DATETIME NULL,
-    finalizado BOOLEAN NOT NULL DEFAULT FALSE
-
+    finalizado BOOLEAN NOT NULL DEFAULT FALSE,
+    exitoso BOOLEAN NULL DEFAULT FALSE
 );
 
 
@@ -178,7 +180,11 @@ CREATE TABLE recorridos
     dispositivo_id INT UNSIGNED NOT NULL,
     latencia INT UNSIGNED NOT NULL,
     ttl_final INT UNSIGNED NOT NULL,
+    orden INT UNSIGNED NOT NULL,
 
+    CONSTRAINT uq_recorrido_orden
+    UNIQUE (simulacion_id, orden),
+    
     CONSTRAINT fk_recorrido_simulacion
         FOREIGN KEY (simulacion_id)
         REFERENCES simulaciones(id),

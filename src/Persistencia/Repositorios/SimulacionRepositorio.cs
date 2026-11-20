@@ -71,6 +71,70 @@ namespace Persistencia.Repositorios
                     FechaFin = DateTime.Now,
                     Exitoso = exitoso
             });
+            
+        }
+        public void Eliminar(int id)
+        {
+            using MySqlConnection connection = conexion.CrearConexion();
+            connection.Open();
+
+            using var transaccion = connection.BeginTransaction();
+
+            try
+            {
+                string sql = @"
+                    DELETE FROM simulacion_paquetes
+                    WHERE simulacion_id = @Id;
+
+                    DELETE FROM recorridos
+                    WHERE simulacion_id = @Id;
+
+                    DELETE FROM simulaciones
+                    WHERE id = @Id;
+                ";
+
+                connection.Execute(sql, new { Id = id }, transaccion);
+
+                transaccion.Commit();
+            }
+            catch
+            {
+                transaccion.Rollback();
+                throw;
+            }
+        }
+
+        public void AgregarPaso(int simulacionId, int dispositivoId, int orden, int latencia, int ttlFinal)
+        {
+            using MySqlConnection connection = conexion.CrearConexion();
+
+            string sql = @"
+                INSERT INTO recorridos
+                (simulacion_id, dispositivo_id, orden, latencia, ttl_final)
+                VALUES
+                (@SimulacionId, @DispositivoId, @Orden, @Latencia, @TtlFinal);
+            ";
+
+            connection.Execute(sql, new
+            {
+                SimulacionId = simulacionId,
+                DispositivoId = dispositivoId,
+                Orden = orden,
+                Latencia = latencia,
+                TtlFinal = ttlFinal
+            });
+        }
+
+        public void EliminarPasos(int simulacionId)
+        {
+            using MySqlConnection connection = conexion.CrearConexion();
+
+            string sql = @"
+                DELETE FROM recorridos
+                WHERE simulacion_id = @SimulacionId;
+            ";
+
+            connection.Execute(sql, new { SimulacionId = simulacionId });
         }
     }
 }
