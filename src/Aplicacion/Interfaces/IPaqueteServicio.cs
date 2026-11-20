@@ -5,5 +5,6 @@ namespace Aplicacion.Interfaces
     public interface IPaqueteServicio
     {
         void CrearPaquete(Simulacion simulacion, PaqueteRed paquete);
+        void ActualizarResultado(PaqueteRed paquete);
     }
 }

@@ -1,6 +1,7 @@
 namespace Persistencia.Entidades;
     public class Simulacion
     {
+        public bool? Exitoso {get;set;}
         public DateTime FechaInicio{get;set;}
         public DateTime? FechaFin{get;set;}
         public bool Finalizado {get;set;}
@@ -39,20 +40,22 @@ namespace Persistencia.Entidades;
         {
             Paquetes.Add(paquete);
         }
+        
         public bool ProcesarPaquete(PaqueteRed paquete)
         {
             foreach (DispositivoRed dispositivo in Dispositivos)
             {
                 if (paquete.Ttl <= 0)
                 {
-                    paquete.Procesado = false ;
+                    paquete.Procesado = false;
                     Finalizar(false);
                     return false;
                 }
+
                 bool permitido = dispositivo.ProcesarPaquete(paquete);
 
                 paquete.LatenciaAcumulada += dispositivo.Latencia;
-                paquete.Ttl--;
+
                 if (!permitido)
                 {
                     paquete.Procesado = false;
@@ -60,14 +63,17 @@ namespace Persistencia.Entidades;
                     return false;
                 }
             }
+
             paquete.Procesado = true;
             Finalizar(true);
             return true;
         }
+
         public void Finalizar(bool resultado)
         {
             FechaFin = DateTime.Now;
-            Finalizado = resultado;
+            Finalizado = true;
+            Exitoso = resultado;
         }
     }
 

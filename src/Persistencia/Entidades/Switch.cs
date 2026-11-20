@@ -57,6 +57,30 @@ namespace Persistencia.Entidades;
             VlanActiva = vlanActiva;
             CantidadVlan = cantidadVlan;
         }
+
+        public Switch()
+            : base()
+        {
+        }
+
+        public Switch(
+            string nombre,
+            string direccionIp,
+            string direccionMAC,
+            bool encendido,
+            int cantidadPuertos,
+            int puertosOcupados,
+            bool vlanActiva,
+            int cantidadVlan,
+            int latencia)
+            : base(nombre, direccionIp, direccionMAC, encendido, latencia)
+        {
+            CantidadPuertos = cantidadPuertos;
+            PuertosOcupados = puertosOcupados;
+            VlanActiva = vlanActiva;
+            CantidadVlan = cantidadVlan;
+        }
+
         public override bool ProcesarPaquete(PaqueteRed paquete)
         {
             if (!Encendido)

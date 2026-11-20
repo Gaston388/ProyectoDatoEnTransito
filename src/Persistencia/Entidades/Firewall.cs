@@ -70,9 +70,42 @@ namespace Persistencia.Entidades
             BloqueaTraficoSaliente = bloqueaTraficoSaliente;
             Tipo = tipo;
         }
+        public Firewall()
+            : base()
+        {
+        }
+
+        public Firewall(
+            string nombre,
+            string direccionIp,
+            string direccionMAC,
+            bool encendido,
+            bool filtradoActivo,
+            string politicaPredeterminada,
+            int cantidadReglas,
+            bool bloqueaTraficoEntrante,
+            bool bloqueaTraficoSaliente,
+            string tipo,
+            int latencia)
+            : base(nombre, direccionIp, direccionMAC, encendido, latencia)
+        {
+            FiltradoActivo = filtradoActivo;
+            PoliticaPredeterminada = politicaPredeterminada;
+            CantidadReglas = cantidadReglas;
+            BloqueaTraficoEntrante = bloqueaTraficoEntrante;
+            BloqueaTraficoSaliente = bloqueaTraficoSaliente;
+            Tipo = tipo;
+        }
+        
         public override bool ProcesarPaquete(PaqueteRed paquete)
         {
             if (!Encendido)
+            {
+                return false;
+            }
+
+            // El firewall no permite paquetes mayores a 1500 bytes.
+            if (paquete.Tamaño > 1500)
             {
                 return false;
             }
@@ -86,11 +119,14 @@ namespace Persistencia.Entidades
             {
                 return false;
             }
-            if(PoliticaPredeterminada.ToLower() == "bloquear")
+
+            if (PoliticaPredeterminada == "bloquear")
             {
                 return false;
             }
+
             return true;
         }
+
     }
 }

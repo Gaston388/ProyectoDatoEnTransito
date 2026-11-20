@@ -6,5 +6,7 @@ namespace Persistencia.Repositorios.InterfazRepositorios
     {
         Simulacion? BuscarPorId(int id);
         List<Simulacion> Listar();
+        public int Agregar(Simulacion simulacion);
+        void Finalizar(int id, bool exitoso);
     }
 }

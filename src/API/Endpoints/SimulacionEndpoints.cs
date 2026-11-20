@@ -1,6 +1,6 @@
 using Aplicacion.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-
+using Aplicacion.DTOs;
 namespace API.Endpoints
 {
     public static class SimulacionEndpoints
@@ -22,6 +22,31 @@ namespace API.Endpoints
                     return Results.NotFound();
 
                 return Results.Ok(simulacion);
+            });
+            // POST /api/simulaciones
+           app.MapPost("/api/simulaciones",
+                ([FromBody] SimulacionRequestDto solicitud,
+                [FromServices] ISimulacionServicio servicio) =>
+            {
+                var resultado = servicio.CrearSimulacion(solicitud);
+
+                return Results.Created(
+                    $"/api/simulaciones/{resultado.Id}",
+                    resultado
+                );
+            });
+            // POST /api/simulaciones/{id}/finalizar
+            app.MapPost("/api/simulaciones/{id:int}/finalizar",
+                (int id, bool exitoso, [FromServices] ISimulacionServicio servicio) =>
+            {
+                servicio.Finalizar(id, exitoso);
+
+                return Results.Ok(new
+                {
+                    mensaje = "Simulación finalizada correctamente.",
+                    id = id,
+                    exitoso = exitoso
+                });
             });
         }
     }

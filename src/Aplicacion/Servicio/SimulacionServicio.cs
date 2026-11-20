@@ -1,21 +1,41 @@
 using Aplicacion.Interfaces;
 using Persistencia.Entidades;
 using Persistencia.Repositorios.InterfazRepositorios;
-
+using Aplicacion.DTOs;
 namespace Aplicacion.Servicios
 {
     public class SimulacionServicio : ISimulacionServicio
     {
         private readonly ISimulacionRepositorio? _simulacionRepositorio;
-
-        public SimulacionServicio(ISimulacionRepositorio simulacionRepositorio)
+        private readonly IRouterRepositorio? _routerRepositorio;
+        private readonly ISwitchRepositorio? _switchRepositorio;
+        private readonly IFirewallRepositorio? _firewallRepositorio;
+        private readonly IAccessPointRepositorio? _accessPointRepositorio;
+        private readonly IPaqueteServicio? _paqueteServicio;
+        public SimulacionServicio(
+            ISimulacionRepositorio simulacionRepositorio,
+            IRouterRepositorio routerRepositorio,
+            ISwitchRepositorio switchRepositorio,
+            IFirewallRepositorio firewallRepositorio,
+            IAccessPointRepositorio accessPointRepositorio,
+            IPaqueteServicio paqueteServicio)
         {
-            _simulacionRepositorio = simulacionRepositorio;        
+            _simulacionRepositorio = simulacionRepositorio;
+            _routerRepositorio = routerRepositorio;
+            _switchRepositorio = switchRepositorio;
+            _firewallRepositorio = firewallRepositorio;
+            _accessPointRepositorio = accessPointRepositorio;
+            _paqueteServicio = paqueteServicio;
         }
         //este constructor vacio se conserva para no impedir las operaciones en memoria
         public SimulacionServicio()
         {
-            _simulacionRepositorio = null ;
+            _simulacionRepositorio = null;
+            _routerRepositorio = null;
+            _switchRepositorio = null;
+            _firewallRepositorio = null;
+            _accessPointRepositorio = null;
+            _paqueteServicio = null;
         }
         public void AgregarDispositivo(Simulacion simulacion, DispositivoRed dispositivo)
         {
@@ -83,6 +103,183 @@ namespace Aplicacion.Servicios
             }
 
             return _simulacionRepositorio.Listar();
+        }
+        public int Agregar()
+        {
+            if(_simulacionRepositorio == null)
+            {
+                throw new InvalidOperationException("El repositorio de simulación no está inicializado.");
+            }
+            Simulacion simulacion = new Simulacion
+            {
+                FechaInicio = DateTime.Now,
+                Finalizado = false  
+            };
+            return _simulacionRepositorio.Agregar(simulacion);
+        }
+        public void Finalizar(int id, bool exitoso)
+        {
+            if (id <= 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    nameof(id), "El ID debe ser mayor que 0.");
+            }
+
+            if (_simulacionRepositorio == null)
+            {
+                throw new InvalidOperationException(
+                    "El repositorio de simulación no está inicializado.");
+            }
+
+            Simulacion? simulacion = _simulacionRepositorio.BuscarPorId(id);
+
+            if (simulacion == null)
+            {
+                throw new KeyNotFoundException(
+                    "No existe una simulación con ese ID.");
+            }
+
+            if (simulacion.Finalizado)
+            {
+                throw new InvalidOperationException(
+                    "La simulación ya está finalizada.");
+            }
+
+            _simulacionRepositorio.Finalizar(id, exitoso);
+        }
+       private DispositivoRed ObtenerDispositivo(DispositivoSimulacionDto solicitud)
+        {
+            if (solicitud.Id <= 0)
+                throw new ArgumentException("El ID del dispositivo debe ser mayor a cero.");
+
+            if (string.IsNullOrWhiteSpace(solicitud.Tipo))
+                throw new ArgumentException("El tipo de dispositivo es obligatorio.");
+
+            DispositivoRed? dispositivo = solicitud.Tipo.Trim().ToLowerInvariant() switch
+            {
+                "router" => _routerRepositorio?.ObtenerPorId(solicitud.Id),
+
+                "switch" => _switchRepositorio?.ObtenerPorId(solicitud.Id),
+
+                "firewall" => _firewallRepositorio?.ObtenerPorId(solicitud.Id),
+
+                "accesspoint" or "access point" => _accessPointRepositorio?.ObtenerPorId(solicitud.Id),
+
+                _ => throw new ArgumentException(
+                    $"El tipo de dispositivo '{solicitud.Tipo}' no es válido.")
+            };
+
+            if (dispositivo is null)
+                throw new ArgumentException(
+                    $"No se encontró un dispositivo de tipo '{solicitud.Tipo}' con ID {solicitud.Id}.");
+
+            return dispositivo;
+        }
+        private void ValidarSolicitud(SimulacionRequestDto solicitud)
+        {
+            if (solicitud is null)
+                throw new ArgumentNullException(nameof(solicitud));
+
+            if (string.IsNullOrWhiteSpace(solicitud.Origen))
+                throw new ArgumentException("La IP de origen es obligatoria.");
+
+            if (string.IsNullOrWhiteSpace(solicitud.Destino))
+                throw new ArgumentException("La IP de destino es obligatoria.");
+
+            if (solicitud.TamanioBytes <= 0)
+                throw new ArgumentException("El tamaño del paquete debe ser mayor a cero.");
+
+            if (solicitud.Ttl <= 0)
+                throw new ArgumentException("El TTL debe ser mayor a cero.");
+
+            if (solicitud.Dispositivos is null || solicitud.Dispositivos.Count == 0)
+                throw new ArgumentException("Debe indicar al menos un dispositivo.");
+
+            foreach (var dispositivo in solicitud.Dispositivos)
+            {
+                if (dispositivo is null)
+                    throw new ArgumentException("La lista contiene un dispositivo inválido.");
+
+                if (dispositivo.Id <= 0)
+                    throw new ArgumentException("El ID de cada dispositivo debe ser mayor a cero.");
+
+                if (string.IsNullOrWhiteSpace(dispositivo.Tipo))
+                    throw new ArgumentException("Todos los dispositivos deben tener un tipo.");
+            }
+        }
+        private List<DispositivoRed> ObtenerDispositivos(SimulacionRequestDto solicitud)
+        {
+            var dispositivos = new List<DispositivoRed>();
+            foreach (var dispositivoSolicitud in solicitud.Dispositivos)
+            {
+                var dispositivo = ObtenerDispositivo(dispositivoSolicitud);
+                dispositivos.Add(dispositivo);
+            }
+            return dispositivos;
+        }
+        public SimulacionResponseDto CrearSimulacion(SimulacionRequestDto solicitud)
+        {
+            ValidarSolicitud(solicitud);
+
+            if (_simulacionRepositorio is null ||
+                _paqueteServicio is null)
+            {
+                throw new InvalidOperationException(
+                    "Los servicios necesarios no están configurados.");
+            }
+
+            // 1. Recuperamos los dispositivos solicitados.
+            List<DispositivoRed> dispositivos =
+                ObtenerDispositivos(solicitud);
+
+            // 2. Creamos la simulación en la base de datos.
+            int simulacionId = Agregar();
+
+            // 3. Recuperamos la simulación recién creada.
+            Simulacion? simulacion =
+                _simulacionRepositorio.BuscarPorId(simulacionId);
+
+            if (simulacion is null)
+            {
+                throw new InvalidOperationException(
+                    "No se pudo recuperar la simulación creada.");
+            }
+
+            // 4. Agregamos los dispositivos a la simulación.
+            foreach (var dispositivo in dispositivos)
+            {
+                AgregarDispositivo(simulacion, dispositivo);
+            }
+
+            // 5. Creamos el paquete.
+            PaqueteRed paquete = new PaqueteRed(
+                solicitud.Ttl,
+                solicitud.Origen,
+                solicitud.Destino,
+                "00:00:00:00:00:01",
+                "00:00:00:00:00:02",
+                solicitud.TamanioBytes,
+                "TCP",
+                "Datos de prueba",
+                DateTime.Now
+            );
+
+            // 6. Guardamos el paquete y lo asociamos.
+            _paqueteServicio.CrearPaquete(simulacion, paquete);
+            
+            bool exitoso = ProcesarPaquete(simulacion, paquete);
+
+            _paqueteServicio.ActualizarResultado(paquete);
+
+            Finalizar(simulacion.Id, exitoso);
+            // Por ahora devolvemos el estado inicial.
+            return new SimulacionResponseDto
+            {
+                Id = simulacion.Id,
+                Estado = exitoso ? "Exitoso" : "Fallido",
+                TtlFinal = paquete.TtlFinal ?? paquete.Ttl,
+                LatenciaTotalMs = paquete.LatenciaAcumulada
+            };
         }
     }
 }

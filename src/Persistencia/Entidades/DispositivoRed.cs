@@ -78,6 +78,22 @@ namespace Persistencia.Entidades
             Encendido = encendido;
             Latencia = latencia;
         }
+        public DispositivoRed(
+            string nombre,
+            string direccionIp,
+            string direccionMAC,
+            bool encendido,
+            int latencia)
+        {
+            Nombre = nombre;
+            DireccionIp = direccionIp;
+            DireccionMAC = direccionMAC;
+            Encendido = encendido;
+            Latencia = latencia;
+        }
+        protected DispositivoRed()
+        {
+        }
         public abstract bool ProcesarPaquete(PaqueteRed paquete);
     }
 }

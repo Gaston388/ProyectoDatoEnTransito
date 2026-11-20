@@ -4,8 +4,9 @@ namespace Persistencia.Repositorios.InterfazRepositorios
 {
     public interface IPaqueteRedRepositorio
     {
-        void Agregar(PaqueteRed paqueteRed);
-        PaqueteRed ObtenerPorId(int id);
+        int Agregar(PaqueteRed paqueteRed, int simulacionId);
+        PaqueteRed? ObtenerPorId(int id);
         List <PaqueteRed> Listar();
+        void ActualizarResultado(PaqueteRed paquete);
     }
 }

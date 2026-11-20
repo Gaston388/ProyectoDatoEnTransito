@@ -2,6 +2,7 @@ namespace Persistencia.Entidades
 {
     public class PaqueteRed
     {
+        public int? TtlFinal{get;set;}
         private int ttl;
         public int Ttl
         {
@@ -94,7 +95,7 @@ namespace Persistencia.Entidades
             get => tamaño;
             set
             {
-                if (value <= 0)
+                if (value < 0)
                 {
                     throw new ArgumentOutOfRangeException(nameof(value),"El tamaño del paquete debe ser mayor que 0.");
                 }
@@ -165,6 +166,11 @@ namespace Persistencia.Entidades
         }        
         public PaqueteRed (int ttl, int id, string ipOrigen, string ipDestino, string macOrigen, string macDestino, int tamaño, string protocolo, string datos, DateTime horaCreacion)
         {
+            if (ttl <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(ttl),
+                    "El TTL inicial debe ser mayor que 0.");
+            }
             Id = id;
             IpOrigen = ipOrigen;
             IpDestino = ipDestino;
@@ -175,6 +181,32 @@ namespace Persistencia.Entidades
             Datos = datos;
             HoraCreacion = horaCreacion;
             Ttl = ttl;
+        }
+        public PaqueteRed(
+            int ttl,
+            string ipOrigen,
+            string ipDestino,
+            string macOrigen,
+            string macDestino,
+            int tamaño,
+            string protocolo,
+            string datos,
+            DateTime horaCreacion)
+        {
+        if (ttl <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(ttl),
+                    "El TTL inicial debe ser mayor que 0.");
+            }
+            Ttl = ttl;
+            IpOrigen = ipOrigen;
+            IpDestino = ipDestino;
+            MacOrigen = macOrigen;
+            MacDestino = macDestino;
+            Tamaño = tamaño;
+            Protocolo = protocolo;
+            Datos = datos;
+            HoraCreacion = horaCreacion;
         }
     }
 }

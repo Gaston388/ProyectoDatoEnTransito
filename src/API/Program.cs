@@ -8,10 +8,22 @@ using API.Endpoints;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddScoped<ConexionDesarrollador>();
-builder.Services.AddScoped<ISimulacionServicio, SimulacionServicio>();
-builder.Services.AddScoped<ISimulacionRepositorio, SimulacionRepositorio>();
-// cuando la api necesite un servicio, .NET sabra como construirlo y que objetos necesita
 
+// cuando la api necesite un servicio, .NET sabra como construirlo y que objetos necesita
+builder.Services.AddScoped<IPaqueteRedRepositorio, PaqueteRedRepositorio>();
+builder.Services.AddScoped<ISimulacionRepositorio, SimulacionRepositorio>();
+builder.Services.AddScoped<IAccessPointRepositorio, AccessPointRepositorio>();
+builder.Services.AddScoped<IFirewallRepositorio, FirewallRepositorio>();
+builder.Services.AddScoped<IRouterRepositorio, RouterRepositorio>();
+builder.Services.AddScoped<ISwitchRepositorio, SwitchRepositorio>();
+
+
+builder.Services.AddScoped<IRouterServicio, RouterServicio>();
+builder.Services.AddScoped<ISwitchServicio, SwitchServicio>();
+builder.Services.AddScoped<IFirewallServicio, FirewallServicio>();
+builder.Services.AddScoped<ISimulacionServicio, SimulacionServicio>();
+builder.Services.AddScoped<IPaqueteServicio, PaqueteServicio>();
+builder.Services.AddScoped<IAccessPointServicio, AccessPointServicio>();
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi(options =>
@@ -47,5 +59,13 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapSimulacionEndpoints();
+
+app.MapRouterEndpoints();
+
+app.MapSwitchEndpoints();
+
+app.MapFirewallEndpoints();
+
+app.MapAccessPointEndpoints();
 //ruta http , recibe un servicio y nos entrega una instancia, 
 app.Run();

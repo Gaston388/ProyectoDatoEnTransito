@@ -21,7 +21,8 @@ namespace Persistencia.Repositorios
             id AS ID,
             fecha_inicio AS FechaInicio,
             fecha_fin AS FechaFin,
-            finalizado As Finalizado
+            finalizado As Finalizado,
+            exitoso AS Exitoso
             FROM simulaciones
             WHERE id = @id;";
             return connection.QueryFirstOrDefault<Simulacion>(sql, new { id });
@@ -34,10 +35,42 @@ namespace Persistencia.Repositorios
             id AS ID,
             fecha_inicio AS FechaInicio,
             fecha_fin AS FechaFin,
-            finalizado As Finalizado
+            finalizado As Finalizado,
+            exitoso AS Exitoso
             FROM simulaciones;";
             return connection.Query<Simulacion>(sql).ToList();
 
+        }
+        public int Agregar(Simulacion simulacion)
+        {
+            using MySqlConnection connection = conexion.CrearConexion();
+            string sql = @"
+            INSERT INTO simulaciones (fecha_inicio, finalizado)
+            VALUES (@FechaInicio, @Finalizado);
+            SELECT LAST_INSERT_ID();";
+            return connection.ExecuteScalar<int>(sql, new
+            {
+                simulacion.FechaInicio,
+                simulacion.Finalizado
+            });
+        }
+        public void Finalizar(int id, bool exitoso)
+        {
+            using MySqlConnection connection = conexion.CrearConexion();
+
+            string sql = @"
+                UPDATE simulaciones
+                SET fecha_fin = @FechaFin,
+                    finalizado = true,
+                    exitoso = @Exitoso
+                    WHERE id = @Id;
+                    ";
+                connection.Execute(sql, new
+                {
+                    Id = id,
+                    FechaFin = DateTime.Now,
+                    Exitoso = exitoso
+            });
         }
     }
 }

@@ -76,6 +76,28 @@ namespace Persistencia.Entidades
             Canal = canal;
             MaximoDispositivos = maximoDispositivos;
         }
+        public AccessPoint()
+            : base()
+        {
+        }
+
+        public AccessPoint(
+            string nombre,
+            string direccionIp,
+            string direccionMAC,
+            bool encendido,
+            string ssid,
+            string seguridad,
+            int canal,
+            int maximoDispositivos,
+            int latencia)
+            : base(nombre, direccionIp, direccionMAC, encendido, latencia)
+        {
+            Ssid = ssid;
+            Seguridad = seguridad;
+            Canal = canal;
+            MaximoDispositivos = maximoDispositivos;
+        }
         public override bool ProcesarPaquete(PaqueteRed paquete)
         {
             if (!Encendido)

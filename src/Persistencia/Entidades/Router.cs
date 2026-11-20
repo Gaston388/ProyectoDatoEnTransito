@@ -36,6 +36,25 @@ namespace Persistencia.Entidades
             PaquetesBloqueados = paquetesBloqueados;
             PaquetesPermitidos = paquetesPermitidos;
         }
+        public Router(
+            string nombre,
+            string direccionIp,
+            string direccionMAC,
+            bool encendido,
+            int paquetesBloqueados,
+            int paquetesPermitidos,
+            int latencia)
+            : base(nombre, direccionIp, direccionMAC, encendido, latencia)
+        {
+            Reglas = new List<string>();
+            PaquetesBloqueados = paquetesBloqueados;
+            PaquetesPermitidos = paquetesPermitidos;
+        }
+        public Router()
+            : base(1, "Temporal", "0.0.0.0", "00:00:00:00:00:00", false, 0)
+        {
+            Reglas = new List<string>();
+        }
         public void AgregarRegla(string regla)
         {
             if (string.IsNullOrWhiteSpace(regla))
@@ -48,9 +67,18 @@ namespace Persistencia.Entidades
         {
             if (!Encendido)
             {
+                PaquetesBloqueados++;
                 return false;
             }
-            // Por ahora el router permite el paquete.
+
+            paquete.Ttl--;
+
+            if (paquete.Ttl <= 0)
+            {
+                PaquetesBloqueados++;
+                return false;
+            }
+
             PaquetesPermitidos++;
             return true;
         }
