@@ -136,5 +136,18 @@ namespace Persistencia.Repositorios
 
             connection.Execute(sql, new { SimulacionId = simulacionId });
         }
+        public void Reiniciar(int id)
+        {
+            using MySqlConnection connection = conexion.CrearConexion();
+
+            string sql = @"
+                UPDATE simulaciones
+                SET fecha_fin = NULL,
+                    finalizado = false,
+                    exitoso = NULL
+                WHERE id = @Id;";
+
+            connection.Execute(sql, new { Id = id });
+        }
     }
 }

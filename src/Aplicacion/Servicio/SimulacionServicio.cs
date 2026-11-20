@@ -268,7 +268,7 @@ namespace Aplicacion.Servicios
             _paqueteServicio.CrearPaquete(simulacion, paquete);
             
             bool exitoso = ProcesarYGuardarRecorrido(simulacion, paquete);
-            
+
             _paqueteServicio.ActualizarResultado(paquete);
 
             Finalizar(simulacion.Id, exitoso);
@@ -339,6 +339,64 @@ namespace Aplicacion.Servicios
 
             return true;
         }
+        public SimulacionResponseDto ActualizarSimulacion(
+            int id, SimulacionRequestDto solicitud)
+        {
+            if (id <= 0)
+                throw new ArgumentOutOfRangeException(nameof(id));
 
+            ValidarSolicitud(solicitud);
+
+            if (_simulacionRepositorio == null || _paqueteServicio == null)
+                throw new InvalidOperationException("Los servicios no están configurados.");
+
+            // Buscamos la simulación.
+            Simulacion? simulacion = _simulacionRepositorio.BuscarPorId(id);
+
+            if (simulacion == null)
+                throw new KeyNotFoundException("No existe esa simulación.");
+
+            // Buscamos el paquete asociado.
+            PaqueteRed? paquete = _paqueteServicio.ObtenerPorSimulacionId(id);
+
+            if (paquete == null)
+                throw new KeyNotFoundException("La simulación no tiene un paquete asociado.");
+
+            // Buscamos los nuevos dispositivos.
+            List<DispositivoRed> dispositivos = ObtenerDispositivos(solicitud);
+
+            // Actualizamos los datos del paquete.
+            paquete.IpOrigen = solicitud.Origen;
+            paquete.IpDestino = solicitud.Destino;
+            paquete.Tamaño = solicitud.TamanioBytes;
+            paquete.Ttl = solicitud.Ttl;
+            paquete.TtlFinal = null;
+            paquete.Procesado = false;
+            paquete.LatenciaAcumulada = 0;
+
+            _paqueteServicio.ActualizarDatos(paquete);
+
+            // Eliminamos el recorrido anterior y reiniciamos la simulación.
+            _simulacionRepositorio.EliminarPasos(id);
+            _simulacionRepositorio.Reiniciar(id);
+
+            // Agregamos los nuevos dispositivos.
+            foreach (var dispositivo in dispositivos)
+                AgregarDispositivo(simulacion, dispositivo);
+
+            // Procesamos nuevamente el paquete.
+            bool exitoso = ProcesarYGuardarRecorrido(simulacion, paquete);
+
+            _paqueteServicio.ActualizarResultado(paquete);
+            Finalizar(id, exitoso);
+
+            return new SimulacionResponseDto
+            {
+                Id = id,
+                Estado = exitoso ? "Exitoso" : "Fallido",
+                TtlFinal = paquete.TtlFinal ?? paquete.Ttl,
+                LatenciaTotalMs = paquete.LatenciaAcumulada
+            };
+        }
     }
 }

@@ -60,6 +60,17 @@ namespace API.Endpoints
 
                 return Results.NoContent();
             });
+
+            // PUT /api/simulaciones/{id}
+            app.MapPut("/api/simulaciones/{id:int}",
+                (int id,
+                [FromBody] SimulacionRequestDto solicitud,
+                [FromServices] ISimulacionServicio servicio) =>
+            {
+                var resultado = servicio.ActualizarSimulacion(id, solicitud);
+
+                return Results.Ok(resultado);
+            });
         }
     }
 }
