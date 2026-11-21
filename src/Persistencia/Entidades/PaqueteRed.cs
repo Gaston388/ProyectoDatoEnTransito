@@ -143,7 +143,7 @@ namespace Persistencia.Entidades
             get => horaCreacion;
             set
             {
-                if (value > DateTime.Now)
+                if (value > DateTime.Now.AddSeconds(5))
                 {
                     throw new ArgumentException("La hora de creación no puede estar en el futuro.");
                 }
@@ -207,6 +207,9 @@ namespace Persistencia.Entidades
             Protocolo = protocolo;
             Datos = datos;
             HoraCreacion = horaCreacion;
+        }
+        public PaqueteRed()
+        {
         }
     }
 }

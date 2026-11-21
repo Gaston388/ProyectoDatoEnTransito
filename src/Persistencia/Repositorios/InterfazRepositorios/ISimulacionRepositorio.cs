@@ -12,5 +12,7 @@ namespace Persistencia.Repositorios.InterfazRepositorios
         void AgregarPaso(int simulacionId, int dispositivoId, int orden, int latencia, int ttlFinal);
         void EliminarPasos(int simulacionId);
         void Reiniciar(int id);
+        void ActualizarPaso(int simulacionId, int orden, int dispositivoId, int latencia, int ttlFinal);
+        List<Recorrido> ListarPasos(int simulacionId);
     }
 }

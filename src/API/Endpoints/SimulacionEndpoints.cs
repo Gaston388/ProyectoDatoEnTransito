@@ -35,20 +35,6 @@ namespace API.Endpoints
                     resultado
                 );
             });
-            // POST /api/simulaciones/{id}/finalizar
-            app.MapPost("/api/simulaciones/{id:int}/finalizar",
-                (int id, bool exitoso, [FromServices] ISimulacionServicio servicio) =>
-            {
-                servicio.Finalizar(id, exitoso);
-
-                return Results.Ok(new
-                {
-                    mensaje = "Simulación finalizada correctamente.",
-                    id = id,
-                    exitoso = exitoso
-                });
-            });
-
             // DELETE /api/simulaciones/{id}
             app.MapDelete("/api/simulaciones/{id:int}",
                 (int id, ISimulacionServicio servicio) =>
@@ -68,6 +54,17 @@ namespace API.Endpoints
                 [FromServices] ISimulacionServicio servicio) =>
             {
                 var resultado = servicio.ActualizarSimulacion(id, solicitud);
+
+                return Results.Ok(resultado);
+            });
+            // PUT /api/simulaciones/{id}/pasos/{orden}
+            app.MapPut("/api/simulaciones/{id:int}/pasos/{orden:int}",
+                (int id,
+                int orden,
+                [FromBody] ActualizarPasoRequestDto solicitud,
+                [FromServices] ISimulacionServicio servicio) =>
+            {
+                var resultado = servicio.ActualizarPaso(id, orden, solicitud);
 
                 return Results.Ok(resultado);
             });

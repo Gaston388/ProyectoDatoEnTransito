@@ -246,6 +246,113 @@ namespace API.Endpoints
                     LatenciaMs = solicitud.Latencia
                 });
             });
+           app.MapPost("/api/dispositivos", (
+                CrearDispositivoRequestDto solicitud,
+                IRouterServicio routerServicio,
+                ISwitchServicio switchServicio,
+                IFirewallServicio firewallServicio,
+                IAccessPointServicio accessPointServicio) =>
+            {
+                if (string.IsNullOrWhiteSpace(solicitud.Nombre))
+                    return (IResult)Results.BadRequest(new { error = "El nombre es obligatorio." });
+
+                if (solicitud.LatenciaMs < 0)
+                    return Results.BadRequest(new { error = "La latencia no puede ser negativa." });
+
+                string direccionIp = $"192.168.1.{Random.Shared.Next(2, 255)}";
+                string direccionMAC = "02:" + Guid.NewGuid().ToString("N").Substring(0, 10);
+
+                int id;
+                string tipo;
+
+                switch (solicitud.Tipo?.ToLower())
+                {
+                    case "router":
+                        var router = routerServicio.Crear(new RouterRequestDto
+                        {
+                            Nombre = solicitud.Nombre,
+                            DireccionIp = direccionIp,
+                            DireccionMAC = direccionMAC,
+                            Encendido = true,
+                            PaquetesBloqueados = 0,
+                            PaquetesPermitidos = 0,
+                            Latencia = solicitud.LatenciaMs
+                        });
+
+                        id = router.Id;
+                        tipo = "Router";
+                        break;
+
+                    case "switch":
+                        var sw = switchServicio.Crear(new SwitchRequestDto
+                        {
+                            Nombre = solicitud.Nombre,
+                            DireccionIp = direccionIp,
+                            DireccionMAC = direccionMAC,
+                            Encendido = true,
+                            CantidadPuertos = 8,
+                            PuertosOcupados = 0,
+                            VlanActiva = false,
+                            CantidadVlan = 0,
+                            Latencia = solicitud.LatenciaMs
+                        });
+
+                        id = sw.Id;
+                        tipo = "Switch";
+                        break;
+
+                    case "firewall":
+                        var firewall = firewallServicio.Crear(new FirewallRequestDto
+                        {
+                            Nombre = solicitud.Nombre,
+                            DireccionIp = direccionIp,
+                            DireccionMAC = direccionMAC,
+                            Encendido = true,
+                            FiltradoActivo = false,
+                            PoliticaPredeterminada = "permitir",
+                            CantidadReglas = 0,
+                            BloqueaTraficoEntrante = false,
+                            BloqueaTraficoSaliente = false,
+                            Tipo = "Basico",
+                            Latencia = solicitud.LatenciaMs
+                        });
+
+                        id = firewall.Id;
+                        tipo = "Firewall";
+                        break;
+
+                    case "accesspoint":
+                        var accessPoint = accessPointServicio.Crear(new AccessPointRequestDto
+                        {
+                            Nombre = solicitud.Nombre,
+                            DireccionIp = direccionIp,
+                            DireccionMAC = direccionMAC,
+                            Encendido = true,
+                            Ssid = solicitud.Nombre,
+                            Seguridad = "WPA2",
+                            Canal = 6,
+                            MaximoDispositivos = 10,
+                            Latencia = solicitud.LatenciaMs
+                        });
+
+                        id = accessPoint.Id;
+                        tipo = "AccessPoint";
+                        break;
+
+                    default:
+                        return Results.BadRequest(new { error = "Tipo de dispositivo no válido." });
+                }
+
+                var respuesta = new DispositivoDTO
+                {
+                    Id = id,
+                    Nombre = solicitud.Nombre,
+                    Tipo = tipo,
+                    LatenciaMs = solicitud.LatenciaMs
+                };
+
+                return Results.Created($"/api/dispositivos/{id}", respuesta);
+            });
 
         }
     }

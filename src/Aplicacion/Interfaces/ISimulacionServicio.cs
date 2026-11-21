@@ -15,5 +15,6 @@ namespace Aplicacion.Interfaces
         SimulacionResponseDto CrearSimulacion(SimulacionRequestDto solicitud);
         void Eliminar(int id);
         SimulacionResponseDto ActualizarSimulacion(int id, SimulacionRequestDto solicitud);
+        SimulacionResponseDto ActualizarPaso(int simulacionId, int orden, ActualizarPasoRequestDto solicitud);
     }
 }

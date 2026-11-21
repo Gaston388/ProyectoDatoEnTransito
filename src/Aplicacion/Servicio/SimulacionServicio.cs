@@ -86,15 +86,52 @@ namespace Aplicacion.Servicios
         {
             if (id <= 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(id), "El ID debe ser mayor que 0.");
+                throw new ArgumentOutOfRangeException(
+                    nameof(id), "El ID debe ser mayor que 0.");
             }
-            if(_simulacionRepositorio == null)
-            {
-                throw new InvalidOperationException("El repositorio de simulación no está inicializado.");
-            }
-            return _simulacionRepositorio.BuscarPorId(id);
-        }
 
+            if (_simulacionRepositorio == null || _paqueteServicio == null)
+            {
+                throw new InvalidOperationException(
+                    "Los servicios no están inicializados.");
+            }
+
+            // Buscamos los datos generales de la simulación.
+            Simulacion? simulacion =
+                _simulacionRepositorio.BuscarPorId(id);
+
+            if (simulacion == null)
+            {
+                return null;
+            }
+
+            // Recuperamos los pasos del recorrido.
+            List<Recorrido> pasos =
+                _simulacionRepositorio.ListarPasos(id);
+
+            foreach (Recorrido paso in pasos.OrderBy(p => p.Orden))
+            {
+                DispositivoRed dispositivo = ObtenerDispositivo(
+                    new DispositivoSimulacionDto
+                    {
+                        Id = paso.DispositivoId,
+                        Tipo = paso.Tipo
+                    });
+
+                simulacion.Dispositivos.Add(dispositivo);
+            }
+
+            // Recuperamos el paquete asociado.
+            PaqueteRed? paquete =
+                _paqueteServicio.ObtenerPorSimulacionId(id);
+
+            if (paquete != null)
+            {
+                simulacion.Paquetes.Add(paquete);
+            }
+
+            return simulacion;
+        }
         public List<Simulacion> Listar()
         {
             if(_simulacionRepositorio == null)
@@ -394,6 +431,114 @@ namespace Aplicacion.Servicios
             {
                 Id = id,
                 Estado = exitoso ? "Exitoso" : "Fallido",
+                TtlFinal = paquete.TtlFinal ?? paquete.Ttl,
+                LatenciaTotalMs = paquete.LatenciaAcumulada
+            };
+        }
+
+        private string ObtenerTipoDispositivo(int dispositivoId)
+        {
+        if (_routerRepositorio?.ObtenerPorId(dispositivoId) != null)
+            return "Router";
+
+        if (_switchRepositorio?.ObtenerPorId(dispositivoId) != null)
+            return "Switch";
+
+        if (_firewallRepositorio?.ObtenerPorId(dispositivoId) != null)
+            return "Firewall";
+
+        if (_accessPointRepositorio?.ObtenerPorId(dispositivoId) != null)
+            return "AccessPoint";
+
+        throw new KeyNotFoundException(
+            "No existe un dispositivo con ese ID.");
+        }
+        public SimulacionResponseDto ActualizarPaso(int simulacionId, int orden, ActualizarPasoRequestDto solicitud)
+        {
+            // 1. Validar los datos recibidos.
+            if (simulacionId <= 0)
+                throw new ArgumentException("El ID de la simulación no es válido.");
+
+            if (orden <= 0)
+                throw new ArgumentException("El orden del paso no es válido.");
+
+            if (solicitud == null || solicitud.DispositivoId <= 0)
+                throw new ArgumentException("El ID del dispositivo no es válido.");
+
+            // 2. Verificar que los repositorios y servicios estén disponibles.
+            if (_simulacionRepositorio == null || _paqueteServicio == null)
+                throw new InvalidOperationException(
+                    "Los servicios de simulación no están configurados.");
+
+            // 3. Buscar la simulación.
+            Simulacion? simulacion = _simulacionRepositorio.BuscarPorId(simulacionId);
+
+            if (simulacion == null)
+                throw new KeyNotFoundException("No se encontró la simulación.");
+
+            // 4. Buscar el paquete asociado a la simulación.
+            PaqueteRed? paquete =
+                _paqueteServicio.ObtenerPorSimulacionId(simulacionId);
+
+            if (paquete == null)
+                throw new KeyNotFoundException(
+                    "No se encontró el paquete de la simulación.");
+
+            // 5. Obtener los pasos guardados del recorrido.
+            List<Recorrido> pasos =
+                _simulacionRepositorio.ListarPasos(simulacionId);
+
+            // 6. Buscar el paso que queremos modificar.
+            Recorrido? paso = pasos.FirstOrDefault(p => p.Orden == orden);
+
+            if (paso == null)
+                throw new KeyNotFoundException(
+                    "No existe un paso con ese orden.");
+
+            // 7. Averiguar el tipo del nuevo dispositivo.
+            string tipo = ObtenerTipoDispositivo(solicitud.DispositivoId);
+
+            // 8. Reemplazar el dispositivo del paso.
+            paso.DispositivoId = solicitud.DispositivoId;
+            paso.Tipo = tipo;
+
+            // 9. Reconstruir la lista de dispositivos del recorrido.
+            simulacion.Dispositivos.Clear();
+
+            foreach (Recorrido recorrido in pasos.OrderBy(p => p.Orden))
+            {
+                DispositivoRed dispositivo = ObtenerDispositivo(
+                    new DispositivoSimulacionDto
+                    {
+                        Id = recorrido.DispositivoId,
+                        Tipo = recorrido.Tipo
+                    });
+
+                simulacion.Dispositivos.Add(dispositivo);
+            }
+
+            // 10. Reiniciar los resultados anteriores del paquete.
+            paquete.TtlFinal = null;
+            paquete.Procesado = false;
+            paquete.LatenciaAcumulada = 0;
+
+            // 11. Eliminar el recorrido anterior y reiniciar la simulación.
+            _simulacionRepositorio.EliminarPasos(simulacionId);
+            _simulacionRepositorio.Reiniciar(simulacionId);
+
+            // 12. Procesar nuevamente todo el recorrido.
+            bool exitoso = ProcesarYGuardarRecorrido(simulacion, paquete);
+
+            // 13. Guardar los nuevos resultados.
+            _paqueteServicio.ActualizarResultado(paquete);
+
+            Finalizar(simulacionId, exitoso);
+
+            // 14. Devolver la respuesta.
+            return new SimulacionResponseDto
+            {
+                Id = simulacionId,
+                Estado = exitoso ? "Exitosa" : "Fallida",
                 TtlFinal = paquete.TtlFinal ?? paquete.Ttl,
                 LatenciaTotalMs = paquete.LatenciaAcumulada
             };

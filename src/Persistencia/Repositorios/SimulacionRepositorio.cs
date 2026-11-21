@@ -149,5 +149,66 @@ namespace Persistencia.Repositorios
 
             connection.Execute(sql, new { Id = id });
         }
+        public void ActualizarPaso(
+            int simulacionId,
+            int orden,
+            int dispositivoId,
+            int latencia,
+            int ttlFinal)
+        {
+            using MySqlConnection connection = conexion.CrearConexion();
+
+            string sql = @"
+                UPDATE recorridos
+                SET dispositivo_id = @DispositivoId,
+                    latencia = @Latencia,
+                    ttl_final = @TtlFinal
+                WHERE simulacion_id = @SimulacionId
+                AND orden = @Orden;
+            ";
+
+            connection.Execute(sql, new
+            {
+                SimulacionId = simulacionId,
+                Orden = orden,
+                DispositivoId = dispositivoId,
+                Latencia = latencia,
+                TtlFinal = ttlFinal
+            });
+            
+        }
+        public List<Recorrido> ListarPasos(int simulacionId)
+        {
+            using MySqlConnection connection = conexion.CrearConexion();
+
+            string sql = @"
+                SELECT
+                    r.dispositivo_id AS DispositivoId,
+                    r.orden AS Orden,
+                    CASE
+                        WHEN ro.dispositivo_id IS NOT NULL THEN 'Router'
+                        WHEN sw.dispositivo_id IS NOT NULL THEN 'Switch'
+                        WHEN fw.dispositivo_id IS NOT NULL THEN 'Firewall'
+                        WHEN ap.dispositivo_id IS NOT NULL THEN 'AccessPoint'
+                    END AS Tipo
+                FROM recorridos r
+                LEFT JOIN routers ro
+                    ON ro.dispositivo_id = r.dispositivo_id
+                LEFT JOIN switches sw
+                    ON sw.dispositivo_id = r.dispositivo_id
+                LEFT JOIN firewalls fw
+                    ON fw.dispositivo_id = r.dispositivo_id
+                LEFT JOIN access_points ap
+                    ON ap.dispositivo_id = r.dispositivo_id
+                WHERE r.simulacion_id = @SimulacionId
+                ORDER BY r.orden;
+            ";
+
+            return connection.Query<Recorrido>(
+                sql,
+                new { SimulacionId = simulacionId }
+            ).ToList();
+        }
+
     }
 }
