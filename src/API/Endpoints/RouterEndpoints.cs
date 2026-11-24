@@ -1,3 +1,4 @@
+
 using Aplicacion.DTOs;
 using Aplicacion.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,8 @@ namespace API.Endpoints
             app.MapGet("/api/routers", ([FromServices] IRouterServicio servicio) =>
             {
                 return Results.Ok(servicio.Listar());
-            });
+            })
+            .WithTags("Routers");
 
             app.MapGet("/api/routers/{id:int}", (int id, [FromServices] IRouterServicio servicio) =>
             {
@@ -21,7 +23,8 @@ namespace API.Endpoints
                     return Results.NotFound();
 
                 return Results.Ok(router);
-            });
+            })
+            .WithTags("Routers");
 
             app.MapPost("/api/routers",
                 ([FromBody] RouterRequestDto solicitud,
@@ -33,8 +36,9 @@ namespace API.Endpoints
                     $"/api/routers/{router.Id}",
                     router
                 );
-            });
-            
+            })
+            .WithTags("Routers");
+
             app.MapDelete("/api/routers/{id:int}", (int id, [FromServices] IRouterServicio servicio) =>
             {
                 var router = servicio.ObtenerPorId(id);
@@ -45,7 +49,8 @@ namespace API.Endpoints
                 servicio.Eliminar(id);
 
                 return Results.NoContent();
-            });
+            })
+            .WithTags("Routers");
 
             app.MapPut("/api/routers/{id:int}", (
                 int id,
@@ -60,7 +65,8 @@ namespace API.Endpoints
                 servicio.Actualizar(id, solicitud);
 
                 return Results.NoContent();
-            });
+            })
+            .WithTags("Routers");
         }
     }
 }

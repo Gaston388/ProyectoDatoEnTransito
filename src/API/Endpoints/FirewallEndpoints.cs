@@ -1,3 +1,4 @@
+
 using Aplicacion.DTOs;
 using Aplicacion.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,8 @@ namespace API.Endpoints
             app.MapGet("/api/firewalls", ([FromServices] IFirewallServicio servicio) =>
             {
                 return Results.Ok(servicio.Listar());
-            });
+            })
+            .WithTags("Firewalls");
 
             app.MapGet("/api/firewalls/{id:int}", (int id, [FromServices] IFirewallServicio servicio) =>
             {
@@ -21,7 +23,8 @@ namespace API.Endpoints
                     return Results.NotFound();
 
                 return Results.Ok(firewall);
-            });
+            })
+            .WithTags("Firewalls");
 
             app.MapPost("/api/firewalls", ([FromBody] FirewallRequestDto solicitud,
                 [FromServices] IFirewallServicio servicio) =>
@@ -29,7 +32,8 @@ namespace API.Endpoints
                 var firewall = servicio.Crear(solicitud);
 
                 return Results.Created($"/api/firewalls/{firewall.Id}", firewall);
-            });
+            })
+            .WithTags("Firewalls");
 
             app.MapDelete("/api/firewalls/{id:int}", (int id, [FromServices] IFirewallServicio servicio) =>
             {
@@ -41,7 +45,8 @@ namespace API.Endpoints
                 servicio.Eliminar(id);
 
                 return Results.NoContent();
-            });
+            })
+            .WithTags("Firewalls");
 
             app.MapPut("/api/firewalls/{id:int}", (
                 int id,
@@ -56,7 +61,8 @@ namespace API.Endpoints
                 servicio.Actualizar(id, solicitud);
 
                 return Results.NoContent();
-            });
+            })
+            .WithTags("Firewalls");
         }
     }
 }

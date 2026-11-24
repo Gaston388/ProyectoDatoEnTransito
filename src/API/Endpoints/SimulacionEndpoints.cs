@@ -1,19 +1,23 @@
+
 using Aplicacion.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Aplicacion.DTOs;
+
 namespace API.Endpoints
 {
     public static class SimulacionEndpoints
     {
         public static void MapSimulacionEndpoints(this IEndpointRouteBuilder app)
         {
-            // GET /api/simulaciones
+            // GET: Listar todas las simulaciones
             app.MapGet("/api/simulaciones", ([FromServices] ISimulacionServicio servicio) =>
             {
                 var simulaciones = servicio.Listar();
                 return Results.Ok(simulaciones);
-            });
-            // GET /api/simulaciones/{id}
+            })
+            .WithTags("Simulaciones");
+
+            // GET: Buscar una simulación por ID
             app.MapGet("/api/simulaciones/{id:int}", (int id, [FromServices] ISimulacionServicio servicio) =>
             {
                 var simulacion = servicio.BuscarPorId(id);
@@ -22,9 +26,11 @@ namespace API.Endpoints
                     return Results.NotFound();
 
                 return Results.Ok(simulacion);
-            });
-            // POST /api/simulaciones
-           app.MapPost("/api/simulaciones",
+            })
+            .WithTags("Simulaciones");
+
+            // POST: Crear una simulación
+            app.MapPost("/api/simulaciones",
                 ([FromBody] SimulacionRequestDto solicitud,
                 [FromServices] ISimulacionServicio servicio) =>
             {
@@ -34,10 +40,12 @@ namespace API.Endpoints
                     $"/api/simulaciones/{resultado.Id}",
                     resultado
                 );
-            });
-            // DELETE /api/simulaciones/{id}
+            })
+            .WithTags("Simulaciones");
+
+            // DELETE: Eliminar una simulación
             app.MapDelete("/api/simulaciones/{id:int}",
-                (int id, ISimulacionServicio servicio) =>
+                (int id, [FromServices] ISimulacionServicio servicio) =>
             {
                 if (servicio.BuscarPorId(id) == null)
                     return Results.NotFound();
@@ -45,9 +53,10 @@ namespace API.Endpoints
                 servicio.Eliminar(id);
 
                 return Results.NoContent();
-            });
+            })
+            .WithTags("Simulaciones");
 
-            // PUT /api/simulaciones/{id}
+            // PUT: Actualizar una simulación
             app.MapPut("/api/simulaciones/{id:int}",
                 (int id,
                 [FromBody] SimulacionRequestDto solicitud,
@@ -56,8 +65,10 @@ namespace API.Endpoints
                 var resultado = servicio.ActualizarSimulacion(id, solicitud);
 
                 return Results.Ok(resultado);
-            });
-            // PUT /api/simulaciones/{id}/pasos/{orden}
+            })
+            .WithTags("Simulaciones");
+
+            // PUT: Actualizar un paso del recorrido
             app.MapPut("/api/simulaciones/{id:int}/pasos/{orden:int}",
                 (int id,
                 int orden,
@@ -67,7 +78,8 @@ namespace API.Endpoints
                 var resultado = servicio.ActualizarPaso(id, orden, solicitud);
 
                 return Results.Ok(resultado);
-            });
+            })
+            .WithTags("Simulaciones");
         }
     }
 }

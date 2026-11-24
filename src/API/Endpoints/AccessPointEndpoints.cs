@@ -1,3 +1,4 @@
+
 using Aplicacion.DTOs;
 using Aplicacion.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +12,8 @@ namespace API.Endpoints
             app.MapGet("/api/access-points", ([FromServices] IAccessPointServicio servicio) =>
             {
                 return Results.Ok(servicio.Listar());
-            });
+            })
+            .WithTags("Access Points");
 
             app.MapGet("/api/access-points/{id:int}", (int id, [FromServices] IAccessPointServicio servicio) =>
             {
@@ -21,7 +23,8 @@ namespace API.Endpoints
                     return Results.NotFound();
 
                 return Results.Ok(accessPoint);
-            });
+            })
+            .WithTags("Access Points");
 
             app.MapPost("/api/access-points", ([FromBody] AccessPointRequestDto solicitud,
                 [FromServices] IAccessPointServicio servicio) =>
@@ -29,7 +32,8 @@ namespace API.Endpoints
                 var accessPoint = servicio.Crear(solicitud);
 
                 return Results.Created($"/api/access-points/{accessPoint.Id}", accessPoint);
-            });
+            })
+            .WithTags("Access Points");
 
             app.MapDelete("/api/access-points/{id:int}", (int id, [FromServices] IAccessPointServicio servicio) =>
             {
@@ -41,7 +45,8 @@ namespace API.Endpoints
                 servicio.Eliminar(id);
 
                 return Results.NoContent();
-            });
+            })
+            .WithTags("Access Points");
 
             app.MapPut("/api/access-points/{id:int}", (
                 int id,
@@ -56,7 +61,8 @@ namespace API.Endpoints
                 servicio.Actualizar(id, solicitud);
 
                 return Results.NoContent();
-            });
+            })
+            .WithTags("Access Points");
         }
     }
 }

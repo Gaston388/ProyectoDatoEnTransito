@@ -2,12 +2,15 @@
 using Aplicacion.Interfaces;
 using Aplicacion.DTOs;
 using Persistencia.Entidades;
+using MySqlConnector;
+
 namespace API.Endpoints
 {
     public static class DispositivoEndpoints
     {
         public static void MapDispositivoEndpoints(this IEndpointRouteBuilder app)
         {
+            // GET: Listar todos los dispositivos
             app.MapGet("/api/dispositivos", (
                 IRouterServicio routerServicio,
                 ISwitchServicio switchServicio,
@@ -17,53 +20,22 @@ namespace API.Endpoints
                 var dispositivos = new List<DispositivoDTO>();
 
                 foreach (var d in routerServicio.Listar())
-                {
-                    dispositivos.Add(new DispositivoDTO
-                    {
-                        Id = d.Id,
-                        Nombre = d.Nombre,
-                        Tipo = "Router",
-                        LatenciaMs = d.Latencia
-                    });
-                }
+                    dispositivos.Add(CrearDTO(d.Id, d.Nombre, "Router", d.Latencia));
 
                 foreach (var d in switchServicio.Listar())
-                {
-                    dispositivos.Add(new DispositivoDTO
-                    {
-                        Id = d.Id,
-                        Nombre = d.Nombre,
-                        Tipo = "Switch",
-                        LatenciaMs = d.Latencia
-                    });
-                }
+                    dispositivos.Add(CrearDTO(d.Id, d.Nombre, "Switch", d.Latencia));
 
                 foreach (var d in firewallServicio.Listar())
-                {
-                    dispositivos.Add(new DispositivoDTO
-                    {
-                        Id = d.Id,
-                        Nombre = d.Nombre,
-                        Tipo = "Firewall",
-                        LatenciaMs = d.Latencia
-                    });
-                }
+                    dispositivos.Add(CrearDTO(d.Id, d.Nombre, "Firewall", d.Latencia));
 
                 foreach (var d in accessPointServicio.Listar())
-                {
-                    dispositivos.Add(new DispositivoDTO
-                    {
-                        Id = d.Id,
-                        Nombre = d.Nombre,
-                        Tipo = "AccessPoint",
-                        LatenciaMs = d.Latencia
-                    });
-                }
+                    dispositivos.Add(CrearDTO(d.Id, d.Nombre, "AccessPoint", d.Latencia));
 
                 return Results.Ok(dispositivos);
-            });
-        
-            
+            })
+            .WithTags("Dispositivos");
+
+            // GET: Buscar un dispositivo por ID
             app.MapGet("/api/dispositivos/{id:int}", (
                 int id,
                 IRouterServicio routerServicio,
@@ -74,51 +46,28 @@ namespace API.Endpoints
                 var router = routerServicio.ObtenerPorId(id);
 
                 if (router != null)
-                    return Results.Ok(new DispositivoDTO
-                    {
-                        Id = router.Id,
-                        Nombre = router.Nombre,
-                        Tipo = "Router",
-                        LatenciaMs = router.Latencia
-                    });
+                    return Results.Ok(CrearDTO(router.Id, router.Nombre, "Router", router.Latencia));
 
                 var sw = switchServicio.BuscarPorId(id);
 
                 if (sw != null)
-                    return Results.Ok(new DispositivoDTO
-                    {
-                        Id = sw.Id,
-                        Nombre = sw.Nombre,
-                        Tipo = "Switch",
-                        LatenciaMs = sw.Latencia
-                    });
+                    return Results.Ok(CrearDTO(sw.Id, sw.Nombre, "Switch", sw.Latencia));
 
                 var firewall = firewallServicio.BuscarPorId(id);
 
                 if (firewall != null)
-                    return Results.Ok(new DispositivoDTO
-                    {
-                        Id = firewall.Id,
-                        Nombre = firewall.Nombre,
-                        Tipo = "Firewall",
-                        LatenciaMs = firewall.Latencia
-                    });
+                    return Results.Ok(CrearDTO(firewall.Id, firewall.Nombre, "Firewall", firewall.Latencia));
 
                 var accessPoint = accessPointServicio.BuscarPorId(id);
 
                 if (accessPoint != null)
-                    return Results.Ok(new DispositivoDTO
-                    {
-                        Id = accessPoint.Id,
-                        Nombre = accessPoint.Nombre,
-                        Tipo = "AccessPoint",
-                        LatenciaMs = accessPoint.Latencia
-                    });
+                    return Results.Ok(CrearDTO(accessPoint.Id, accessPoint.Nombre, "AccessPoint", accessPoint.Latencia));
 
                 return Results.NotFound();
-            });
+            })
+            .WithTags("Dispositivos");
 
-
+            // DELETE: Eliminar un dispositivo
             app.MapDelete("/api/dispositivos/{id:int}", (
                 int id,
                 IRouterServicio routerServicio,
@@ -126,33 +75,45 @@ namespace API.Endpoints
                 IFirewallServicio firewallServicio,
                 IAccessPointServicio accessPointServicio) =>
             {
-                if (routerServicio.ObtenerPorId(id) != null)
+                try
                 {
-                    routerServicio.Eliminar(id);
-                    return Results.NoContent();
-                }
+                    if (routerServicio.ObtenerPorId(id) != null)
+                    {
+                        routerServicio.Eliminar(id);
+                        return Results.NoContent();
+                    }
 
-                if (switchServicio.BuscarPorId(id) != null)
+                    if (switchServicio.BuscarPorId(id) != null)
+                    {
+                        switchServicio.Eliminar(id);
+                        return Results.NoContent();
+                    }
+
+                    if (firewallServicio.BuscarPorId(id) != null)
+                    {
+                        firewallServicio.Eliminar(id);
+                        return Results.NoContent();
+                    }
+
+                    if (accessPointServicio.BuscarPorId(id) != null)
+                    {
+                        accessPointServicio.Eliminar(id);
+                        return Results.NoContent();
+                    }
+
+                    return Results.NotFound();
+                }
+                catch (MySqlException ex) when (ex.Number == 1217)
                 {
-                    switchServicio.Eliminar(id);
-                    return Results.NoContent();
+                    return Results.Conflict(new
+                    {
+                        error = "No se puede eliminar el dispositivo porque está siendo utilizado en un recorrido guardado."
+                    });
                 }
+            })
+            .WithTags("Dispositivos");
 
-                if (firewallServicio.BuscarPorId(id) != null)
-                {
-                    firewallServicio.Eliminar(id);
-                    return Results.NoContent();
-                }
-
-                if (accessPointServicio.BuscarPorId(id) != null)
-                {
-                    accessPointServicio.Eliminar(id);
-                    return Results.NoContent();
-                }
-
-                return Results.NotFound();
-            });
-
+            // PUT: Actualizar un dispositivo
             app.MapPut("/api/dispositivos/{id:int}", (
                 int id,
                 ActualizarDispositivoRequestDto solicitud,
@@ -161,7 +122,9 @@ namespace API.Endpoints
                 IFirewallServicio firewallServicio,
                 IAccessPointServicio accessPointServicio) =>
             {
-                if (solicitud.TipoDispositivo.ToLower() == "router")
+                string tipo = solicitud.TipoDispositivo?.ToLower() ?? "";
+
+                if (tipo == "router")
                 {
                     if (routerServicio.ObtenerPorId(id) == null)
                         return Results.NotFound();
@@ -177,7 +140,7 @@ namespace API.Endpoints
                         Latencia = solicitud.Latencia
                     });
                 }
-                else if (solicitud.TipoDispositivo.ToLower() == "switch")
+                else if (tipo == "switch")
                 {
                     if (switchServicio.BuscarPorId(id) == null)
                         return Results.NotFound();
@@ -195,7 +158,7 @@ namespace API.Endpoints
                         Latencia = solicitud.Latencia
                     });
                 }
-                else if (solicitud.TipoDispositivo.ToLower() == "firewall")
+                else if (tipo == "firewall")
                 {
                     if (firewallServicio.BuscarPorId(id) == null)
                         return Results.NotFound();
@@ -215,7 +178,7 @@ namespace API.Endpoints
                         Latencia = solicitud.Latencia
                     });
                 }
-                else if (solicitud.TipoDispositivo.ToLower() == "accesspoint")
+                else if (tipo == "accesspoint")
                 {
                     if (accessPointServicio.BuscarPorId(id) == null)
                         return Results.NotFound();
@@ -238,15 +201,17 @@ namespace API.Endpoints
                     return Results.BadRequest("Tipo de dispositivo no válido.");
                 }
 
-                return Results.Ok(new DispositivoDTO
-                {
-                    Id = id,
-                    Nombre = solicitud.Nombre,
-                    Tipo = solicitud.TipoDispositivo,
-                    LatenciaMs = solicitud.Latencia
-                });
-            });
-           app.MapPost("/api/dispositivos", (
+                return Results.Ok(CrearDTO(
+                    id,
+                    solicitud.Nombre,
+                    solicitud.TipoDispositivo,
+                    solicitud.Latencia
+                ));
+            })
+            .WithTags("Dispositivos");
+
+            // POST: Crear un dispositivo
+            app.MapPost("/api/dispositivos", (
                 CrearDispositivoRequestDto solicitud,
                 IRouterServicio routerServicio,
                 ISwitchServicio switchServicio,
@@ -254,7 +219,7 @@ namespace API.Endpoints
                 IAccessPointServicio accessPointServicio) =>
             {
                 if (string.IsNullOrWhiteSpace(solicitud.Nombre))
-                    return (IResult)Results.BadRequest(new { error = "El nombre es obligatorio." });
+                    return Results.BadRequest(new { error = "El nombre es obligatorio." });
 
                 if (solicitud.LatenciaMs < 0)
                     return Results.BadRequest(new { error = "La latencia no puede ser negativa." });
@@ -343,17 +308,22 @@ namespace API.Endpoints
                         return Results.BadRequest(new { error = "Tipo de dispositivo no válido." });
                 }
 
-                var respuesta = new DispositivoDTO
-                {
-                    Id = id,
-                    Nombre = solicitud.Nombre,
-                    Tipo = tipo,
-                    LatenciaMs = solicitud.LatenciaMs
-                };
+                var respuesta = CrearDTO(id, solicitud.Nombre, tipo, solicitud.LatenciaMs);
 
                 return Results.Created($"/api/dispositivos/{id}", respuesta);
-            });
+            })
+            .WithTags("Dispositivos");
+        }
 
+        private static DispositivoDTO CrearDTO(int id, string nombre, string tipo, int latencia)
+        {
+            return new DispositivoDTO
+            {
+                Id = id,
+                Nombre = nombre,
+                Tipo = tipo,
+                LatenciaMs = latencia
+            };
         }
     }
 }
