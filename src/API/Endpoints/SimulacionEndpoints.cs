@@ -13,10 +13,10 @@ namespace API.Endpoints
             app.MapGet("/api/simulaciones", ([FromServices] ISimulacionServicio servicio) =>
             {
                 var simulaciones = servicio.Listar();
+
                 return Results.Ok(simulaciones);
             })
             .WithTags("Simulaciones");
-
             // GET: Buscar una simulación por ID
             app.MapGet("/api/simulaciones/{id:int}", (int id, [FromServices] ISimulacionServicio servicio) =>
             {

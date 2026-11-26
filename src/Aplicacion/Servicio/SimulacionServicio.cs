@@ -132,14 +132,33 @@ namespace Aplicacion.Servicios
 
             return simulacion;
         }
-        public List<Simulacion> Listar()
+        public List<SimulacionResponseDto> Listar()
         {
-            if(_simulacionRepositorio == null)
+            var simulaciones = _simulacionRepositorio.Listar();
+            var resultado = new List<SimulacionResponseDto>();
+
+            foreach (var simulacion in simulaciones)
             {
-                throw new InvalidOperationException("El repositorio de simulación no está inicializado.");
+                var detalle = BuscarPorId(simulacion.Id);
+
+                if (detalle == null)
+                    continue;
+
+                var paquete = detalle.Paquetes.FirstOrDefault();
+
+                if (paquete == null)
+                    continue;
+
+                resultado.Add(new SimulacionResponseDto
+                {
+                    Id = detalle.Id,
+                    Estado = detalle.Exitoso == true ? "Exitoso" : "Fallido",
+                    TtlFinal = paquete.TtlFinal ?? paquete.Ttl,
+                    LatenciaTotalMs = paquete.LatenciaAcumulada
+                });
             }
 
-            return _simulacionRepositorio.Listar();
+            return resultado;
         }
         public int Agregar()
         {
