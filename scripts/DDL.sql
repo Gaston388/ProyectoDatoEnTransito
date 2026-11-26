@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS datos_transito;
+CREATE DATABASE IF NOT EXISTS 5to_DatosTransito;
 
-USE datos_transito;
+USE 5to_DatosTransito;
 
 
 CREATE TABLE auditorias

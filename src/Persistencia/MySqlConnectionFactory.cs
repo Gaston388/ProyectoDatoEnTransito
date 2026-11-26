@@ -9,7 +9,7 @@ namespace Persistencia.Repositorios
 
         public DbConnectionFactory()
         {
-            _connectionString = "Server=localhost;Port=3306;Database=datos_transito;User ID=desarrollador;Password=Desarrollador1234!;SslMode=None;Charset=utf8mb4;";
+            _connectionString = "Server=localhost;Port=3306;Database=5to_DatosTransito;User ID=5to_agbd;Password=Desarrollador1234!;SslMode=None;Charset=utf8mb4;";
         }
 
         public IDbConnection CrearConnection()

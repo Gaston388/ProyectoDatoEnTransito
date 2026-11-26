@@ -1,4 +1,4 @@
-USE datos_transito;
+USE 5to_DatosTransto;
 
 DROP PROCEDURE IF EXISTS sp_registrar_simulacion;
 

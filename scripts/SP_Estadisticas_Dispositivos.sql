@@ -1,4 +1,4 @@
-USE datos_transito;
+USE 5to_DatosTransito;
 
 DROP PROCEDURE IF EXISTS sp_estadisticas_dispositivos;
 
