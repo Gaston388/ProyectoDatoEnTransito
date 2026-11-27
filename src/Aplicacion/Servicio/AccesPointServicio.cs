@@ -13,9 +13,10 @@ namespace Aplicacion.Servicios
         {
             this.repositorio = repositorio;
         }
-
+        //recibe los datos del access point mediante un dto
         public AccessPoint Crear(AccessPointRequestDto solicitud)
         {
+            //creamos un Access Point utilizando los datos recibidos
             AccessPoint accessPoint = new AccessPoint(
                 solicitud.Nombre,
                 solicitud.DireccionIp,
