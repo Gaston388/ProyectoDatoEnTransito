@@ -211,6 +211,8 @@ namespace Aplicacion.Servicios
             if (string.IsNullOrWhiteSpace(solicitud.Tipo))
                 throw new ArgumentException("El tipo de dispositivo es obligatorio.");
 
+            //Trim() elimina espacios al principio y al final.
+            //ToLowerInvariant() convierte el texto a minúsculas.
             DispositivoRed? dispositivo = solicitud.Tipo.Trim().ToLowerInvariant() switch
             {
                 "router" => _routerRepositorio?.ObtenerPorId(solicitud.Id),

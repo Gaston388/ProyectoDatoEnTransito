@@ -9,12 +9,14 @@ namespace API.Endpoints
     {
         public static void MapRouterEndpoints(this IEndpointRouteBuilder app)
         {
+            // GET: Listar todos los routers.
             app.MapGet("/api/routers", ([FromServices] IRouterServicio servicio) =>
             {
                 return Results.Ok(servicio.Listar());
             })
             .WithTags("Routers");
 
+            // GET: Buscar un router por su ID.
             app.MapGet("/api/routers/{id:int}", (int id, [FromServices] IRouterServicio servicio) =>
             {
                 var router = servicio.ObtenerPorId(id);
@@ -26,12 +28,14 @@ namespace API.Endpoints
             })
             .WithTags("Routers");
 
+            // POST: Crear un nuevo router.
             app.MapPost("/api/routers",
                 ([FromBody] RouterRequestDto solicitud,
                 [FromServices] IRouterServicio servicio) =>
             {
                 var router = servicio.Crear(solicitud);
 
+                // Devuelve 201 e indica la ubicación del router creado.
                 return Results.Created(
                     $"/api/routers/{router.Id}",
                     router
@@ -39,6 +43,7 @@ namespace API.Endpoints
             })
             .WithTags("Routers");
 
+            // PUT: Actualizar los datos de un router.
             app.MapDelete("/api/routers/{id:int}", (int id, [FromServices] IRouterServicio servicio) =>
             {
                 var router = servicio.ObtenerPorId(id);

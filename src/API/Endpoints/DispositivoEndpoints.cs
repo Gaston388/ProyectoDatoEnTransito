@@ -18,7 +18,7 @@ namespace API.Endpoints
                 IAccessPointServicio accessPointServicio) =>
             {
                 var dispositivos = new List<DispositivoDTO>();
-
+                // Buscamos los dispositivos de cada tipo y los agregamos a una lista común.
                 foreach (var d in routerServicio.Listar())
                     dispositivos.Add(CrearDTO(d.Id, d.Nombre, "Router", d.Latencia));
 
@@ -43,6 +43,7 @@ namespace API.Endpoints
                 IFirewallServicio firewallServicio,
                 IAccessPointServicio accessPointServicio) =>
             {
+                // Buscamos el ID en cada tipo de dispositivo hasta encontrarlo.
                 var router = routerServicio.ObtenerPorId(id);
 
                 if (router != null)
@@ -103,6 +104,7 @@ namespace API.Endpoints
 
                     return Results.NotFound();
                 }
+                // El error 1217 indica que no se puede eliminar porque existe una relación con otro registro.
                 catch (MySqlException ex) when (ex.Number == 1217)
                 {
                     return Results.Conflict(new
@@ -122,13 +124,14 @@ namespace API.Endpoints
                 IFirewallServicio firewallServicio,
                 IAccessPointServicio accessPointServicio) =>
             {
+                // Convertimos el tipo a minúsculas para comparar sin importar cómo se escribió.
                 string tipo = solicitud.TipoDispositivo?.ToLower() ?? "";
 
                 if (tipo == "router")
                 {
                     if (routerServicio.ObtenerPorId(id) == null)
                         return Results.NotFound();
-
+                    // Creamos el DTO específico que necesita el servicio de Router.
                     routerServicio.Actualizar(id, new ActualizarRouterRequestDto
                     {
                         Nombre = solicitud.Nombre,
@@ -229,7 +232,7 @@ namespace API.Endpoints
 
                 int id;
                 string tipo;
-
+                // Según el tipo recibido, llamamos al servicio correspondiente.
                 switch (solicitud.Tipo?.ToLower())
                 {
                     case "router":

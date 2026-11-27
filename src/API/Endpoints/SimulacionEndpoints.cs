@@ -68,7 +68,7 @@ namespace API.Endpoints
             })
             .WithTags("Simulaciones");
 
-            // PUT: Actualizar un paso del recorrido
+            // PUT: Actualizar un dispositivo de un paso específico del recorrido.
             app.MapPut("/api/simulaciones/{id:int}/pasos/{orden:int}",
                 (int id,
                 int orden,

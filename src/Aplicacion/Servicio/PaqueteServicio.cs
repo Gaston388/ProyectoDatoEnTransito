@@ -64,7 +64,7 @@ namespace Aplicacion.Servicios
             {
                 throw new InvalidOperationException("No existe ese paquete");
             }
-
+            // Guarda el TTL que tiene el paquete al terminar su procesamiento.
             paquete.TtlFinal = paquete.Ttl;
 
             _paqueteRepositorio.ActualizarResultado(paquete);

@@ -16,6 +16,7 @@ namespace Aplicacion.Servicios
 
         public Router Crear(RouterRequestDto solicitud)
         {
+            // Construye la entidad Router utilizando los datos recibidos.
             Router router = new Router(
                 solicitud.Nombre,
                 solicitud.DireccionIp,

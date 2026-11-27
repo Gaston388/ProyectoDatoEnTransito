@@ -16,6 +16,7 @@ namespace Aplicacion.Servicios
 
         public Firewall Crear(FirewallRequestDto solicitud)
         {
+            // Construye la entidad Firewall con los datos recibidos.
             Firewall firewall = new Firewall(
                 solicitud.Nombre,
                 solicitud.DireccionIp,
@@ -44,18 +45,22 @@ namespace Aplicacion.Servicios
         {
             return repositorio.ObtenerPorId(id);
         }
+
         public void Eliminar(int id)
         {
             repositorio.Eliminar(id);
         }
+
         public void Actualizar(int id, ActualizarFirewallRequestDto solicitud)
         {
             Firewall? firewall = repositorio.ObtenerPorId(id);
 
+            // Si no existe el firewall, no hay nada que actualizar.
             if (firewall is null)
             {
                 return;
             }
+
             firewall.Nombre = solicitud.Nombre;
             firewall.DireccionIp = solicitud.DireccionIp;
             firewall.DireccionMAC = solicitud.DireccionMAC;

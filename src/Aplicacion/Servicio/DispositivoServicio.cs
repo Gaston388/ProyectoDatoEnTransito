@@ -31,7 +31,7 @@ namespace Aplicacion.Servicios
             {
                 throw new ArgumentOutOfRangeException(nameof(id), "El Id debe ser mayor que 0.");
             }
-
+            //recorre todos los dispositivos que pertenecen a la simulacion
             foreach (var dispositivo in simulacion.Dispositivos)
             {
                 if (dispositivo.Id == id)

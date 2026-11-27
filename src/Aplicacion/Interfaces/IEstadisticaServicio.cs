@@ -4,8 +4,10 @@ namespace Aplicacion.Interfaces
 {
     public interface IEstadisticaServicio
     {
-        void ConsultarEstadisticas(Simulacion simulacion);
-        void MostrarEstadisticasDispositivos();
-        void MostrarEstadisticasSimulaciones();
+        Simulacion ConsultarEstadisticas(Simulacion simulacion);
+
+        List<dynamic> ObtenerEstadisticasDispositivos();
+
+        List<dynamic> ObtenerEstadisticasSimulaciones();
     }
 }
